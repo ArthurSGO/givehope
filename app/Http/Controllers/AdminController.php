@@ -40,7 +40,7 @@ class AdminController extends Controller
             'is_admin' => $request->is_admin,
         ]);
 
-        return redirect()->route('admin.dashboard')->with('success','Novo usuário criado com sucesso');
+        return redirect()->route('admin.users.list')->with('success','Novo usuário criado com sucesso');
     }
 
     public function listUser()
@@ -48,5 +48,53 @@ class AdminController extends Controller
         $users = User::all();
         
         return view('admin.users.list', compact('users'));
+    }
+
+    public function editUser(User $user)
+    {
+        return view('admin.users.edit', compact('user'));
+    }
+
+    public function updateUser(Request $request, User $user)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users')->ignore($user->id),
+            ],
+            'password' => 'nullable|string|min:8|confirmed',
+            'is_admin' => 'required|boolean',
+        ]);
+
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->is_admin = $request->is_admin;
+
+        if ($request->filled('password'))
+        {
+            $user->password = Hash::make($request->password);
+        }
+
+        $user->save();
+
+        return redirect()->route('admin.users.list')
+                         ->with('success', 'Usuário atualizado com sucesso!');
+    }
+
+    public function deleteUser(User $user)
+    {
+        if (auth()->user()->id == $user->id)
+        {
+            return back()->with('error', 'Você não pode excluir sua própria conta');
+        }
+
+        $user->delete();
+
+        return redirect()->route('admin.users.list')
+                         ->with('success', 'Usuário excluido com sucesso!');
     }
 }

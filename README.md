@@ -77,7 +77,7 @@ Siga os passos abaixo para configurar o ambiente de desenvolvimento local.
     php artisan serve
     ```
 
-Acesse a aplicação em `http://1227.0.0.1:8000`.
+Acesse a aplicação em `http://127.0.0.1:8000`.
 
 ## 🧑‍💻 Equipe
 
