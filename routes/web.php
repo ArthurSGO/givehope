@@ -25,10 +25,11 @@ Route::middleware(['auth', 'is_admin'])->group(function () {
  Route::delete('users/{user}', [AdminController::class,'deleteUser'])->name('admin.users.delete');
 });
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', function () {return view('welcome');});
+Route::get('inprogress', function () {return view('inprogress');})->name('inprogress');
+Route::get('finished', function () {return view('finished');})->name('finished');
+Route::get('soon', function () {return view('soon');})->name('soon');
+Route::get('about', function () {return view('about');})->name('about');
+Route::get('seek', function () {return view('seek');})->name('seek');
 
 Auth::routes(['register'=> false]);
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
