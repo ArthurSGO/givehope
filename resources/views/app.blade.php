@@ -15,7 +15,7 @@
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
   <body class="d-flex flex-column min-vh-100">
-    <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm mb-3">
+    <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="container">
                 <a class="navbar-brand" href="/">
                     GiveHope
@@ -44,6 +44,13 @@
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    @if (Auth::user()->is_admin)
+                                        <a href="{{ route('admin.dashboard') }}" class="dropdown-item">
+                                            Painel de Administração
+                                        </a>    
+                                        <div class="dropdown-divider"></div>
+                                    @endif
+                                    
                                     <a class="dropdown-item" href="{{ route('logout') }}"
                                        onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
@@ -61,7 +68,7 @@
             </div>
         </nav>
 
-    <div class="container flex-grow-1">
+    <div class="container flex-grow-1 py-4">
         @yield('content')
     </div>
             <footer class="py-3 my-4 mt-5"> 
