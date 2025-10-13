@@ -21,6 +21,9 @@
                         <a href="{{ route('admin.users.list') }}" class="btn btn-success mb-3">
                             Ver todos os usuários
                         </a>
+                        <a href="{{ route('paroquias.index') }}" class="btn btn-success mb-3">
+                            Ver todas as paróquias
+                        </a>
                         
                         <hr>
                         Aqui você poderá gerenciar todas as paróquias cadastradas, verificar dados do sistema, etc.

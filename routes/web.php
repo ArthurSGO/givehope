@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ParoquiaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,12 +19,13 @@ use App\Http\Controllers\AdminController;
 
 Route::middleware(['auth', 'is_admin'])->group(function () {
  Route::get('admin', [AdminController::class, 'index'])->name('admin.dashboard');
- Route::get('users/create', [AdminController::class, 'createUserForm'])->name('admin.users.create');
- Route::get('users', [AdminController::class,'listUser'])->name('admin.users.list');
- Route::post('users', [AdminController::class,'storeUser'])->name('admin.users.store');
- Route::get('users/{user}/edit', [AdminController::class,'editUser'])->name('admin.users.edit');
- Route::put('users/{user}', [AdminController::class,'updateUser'])->name('admin.users.update');
- Route::delete('users/{user}', [AdminController::class,'deleteUser'])->name('admin.users.delete');
+ Route::get('users/create', [UserController::class, 'createUserForm'])->name('admin.users.create');
+ Route::get('users', [UserController::class,'listUser'])->name('admin.users.list');
+ Route::post('users', [UserController::class,'storeUser'])->name('admin.users.store');
+ Route::get('users/{user}/edit', [UserController::class,'editUser'])->name('admin.users.edit');
+ Route::put('users/{user}', [UserController::class,'updateUser'])->name('admin.users.update');
+ Route::delete('users/{user}', [UserController::class,'deleteUser'])->name('admin.users.delete');
+ Route::resource('paroquias',ParoquiaController::class);
 });
 
 Route::get('/', function () {return view('welcome');});

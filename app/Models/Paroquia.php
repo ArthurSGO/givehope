@@ -9,6 +9,15 @@ class Paroquia extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'nome',
+        'cnpj',
+        'logradouro',
+        'cidade',
+        'estado',
+        'telefone',
+    ];
+
     public function users()
     {
         return $this->hasMany(User::class);
