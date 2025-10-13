@@ -34,8 +34,8 @@
                                     <th>ID</th>
                                     <th>Nome</th>
                                     <th>CNPJ</th>
+                                    <th>Email</th>
                                     <th>Cidade</th>
-                                    <th>Criado em</th>
                                     <th>Ações</th>
                                 </tr>
                             </thead>
@@ -44,9 +44,9 @@
                                     <tr>
                                         <td>{{ $paroquia->id }}</td>
                                         <td>{{ $paroquia->nome }}</td>
+                                        <td>{{ $paroquia->cnpj }}</td>
                                         <td>{{ $paroquia->email }}</td>
                                         <td>{{ $paroquia->cidade }}</td>
-                                        <td>{{ $paroquia->created_at->format('d/m/Y H:i') }}</td>
                                         <td>
                                             <a href="{{ route('paroquias.edit', $paroquia->id) }}" class="btn btn-primary btn-sm">
                                                 <i class="fa-solid fa-pen-to-square"></i> Editar

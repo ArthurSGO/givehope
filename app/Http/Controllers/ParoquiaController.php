@@ -37,18 +37,25 @@ class ParoquiaController extends Controller
      */
     public function store(Request $request)
     {
+
+        $request->merge([
+            'cnpj' => preg_replace('/[^\d]/', '', $request->cnpj)
+        ]);
+
         $request->validate([
             'nome' => 'required|string|max:255',
             'cnpj' => 'required|string|unique:paroquias,cnpj|max:14',
             'logradouro' => 'required|string|max:255',
+            'email' => 'nullable|string|unique:paroquias,email|max:255',
             'cidade' => 'required|string|max:100',
             'estado' => 'required|string|max:100',
             'telefone' => 'required|string|max:11',
+            'numero'=> 'required|string|max:5',
         ]);
 
         Paroquia::create($request->all());
 
-        return redirect()->route('paroquia.index')
+        return redirect()->route('paroquias.index')
             ->with('success', 'Paróquia cadastrada com sucesso!');
     }
 
@@ -94,7 +101,7 @@ class ParoquiaController extends Controller
 
         $paroquia->update($request->all());
 
-        return redirect()->route('paroquia.index')
+        return redirect()->route('paroquias.index')
             ->with('success', 'Paróquia atualizada com sucesso!');
     }
 
@@ -108,7 +115,7 @@ class ParoquiaController extends Controller
     {
         $paroquia->delete();
 
-        return redirect()->route('paroquia.index')
+        return redirect()->route('paroquias.index')
             ->with('success', 'Paróquia excluída com sucesso!');
     }
 }

@@ -14,8 +14,10 @@ class Paroquia extends Model
         'cnpj',
         'logradouro',
         'cidade',
+        'email',
         'estado',
         'telefone',
+        'numero',
     ];
 
     public function users()
