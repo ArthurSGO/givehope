@@ -1,4 +1,4 @@
-@extends('app') 
+@extends('app')
 @section('title', 'Editar')
 @section('content')
 <div class="container">
@@ -17,9 +17,9 @@
                             <div class="col-md-6">
                                 <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name', $user->name) }}" required autocomplete="name" autofocus>
                                 @error('name')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
                                 @enderror
                             </div>
                         </div>
@@ -29,9 +29,9 @@
                             <div class="col-md-6">
                                 <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email', $user->email) }}" required autocomplete="email">
                                 @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
                                 @enderror
                             </div>
                         </div>
@@ -41,9 +41,9 @@
                             <div class="col-md-6">
                                 <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" autocomplete="new-password">
                                 @error('password')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
                                 @enderror
                             </div>
                         </div>
@@ -63,9 +63,25 @@
                                     <option value="1">Sim (Administrador Geral)</option>
                                 </select>
                                 @error('is_admin')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="paroquia_id" class="col-md-4 col-form-label text-md-end">Paróquia Responsável</label>
+                            <div class="col-md-6">
+                                <select id="paroquia_id" class="form-control @error('paroquia_id') is-invalid @enderror" name="paroquia_id">
+                                    <option value="">Nenhuma (Apenas Administradores)</option>
+                                    @foreach ($paroquias as $paroquia)
+                                    <option value="{{ $paroquia->id }}" {{ old('paroquia_id', $user->paroquia_id) == $paroquia->id ? 'selected' : '' }}>
+                                        {{ $paroquia->nome }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                                @error('paroquia_id')
+                                <span class="invalid-feedback" role="alert"><strong>{{ $message }}</strong></span>
                                 @enderror
                             </div>
                         </div>
@@ -86,8 +102,7 @@
 </div>
 @push('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function()
-    {
+    document.addEventListener('DOMContentLoaded', function() {
         const userForm = document.getElementById('user-form');
         const submitButton = document.getElementById('submit-button');
         const nameInput = document.getElementById('name');
@@ -104,21 +119,17 @@
             isAdminSelect
         ];
 
-        function validateForm()
-        {
+        function validateForm() {
             let isFormValid = true;
 
-            for (const field of fieldsToValidate)
-            {
-                if (field.value.trim() === '')
-                {
+            for (const field of fieldsToValidate) {
+                if (field.value.trim() === '') {
                     isFormValid = false;
                     break;
                 }
             }
 
-            if (isFormValid && passwordInput.value !== passwordConfirmInput.value)
-            {
+            if (isFormValid && passwordInput.value !== passwordConfirmInput.value) {
                 isFormValid = false;
             }
 

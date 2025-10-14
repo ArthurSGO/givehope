@@ -35,6 +35,7 @@
                                     <th>Nome</th>
                                     <th>Email</th>
                                     <th>Status</th>
+                                    <th>Paróquia</th>
                                     <th>Data de Criação</th>
                                     <th>Ações</th>
                                 </tr>
@@ -50,6 +51,13 @@
                                                 <span class="badge bg-danger">Administrador Geral</span>
                                             @else
                                                 <span class="badge bg-primary">Responsável Paróquia</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if ($user->paroquia)
+                                                {{ $user->paroquia->nome }}
+                                            @else
+                                                -
                                             @endif
                                         </td>
                                         <td>{{ $user->created_at->format('d/m/Y H:i') }}</td>

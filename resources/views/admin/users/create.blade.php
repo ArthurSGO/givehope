@@ -69,6 +69,25 @@
                             </div>
                         </div>
 
+                        <div class="row mb-3">
+                            <label for="paroquia_id" class="col-md-4 col-form-label text-md-end">Paróquia Responsável</label>
+                            <div class="col-md-6">
+                                <select name="paroquia_id" id="paroquia_id" class="form-control @error('paroquia_id') is-invalid @enderror">
+                                    <option value="">Selecione uma paróquia (Obrigatório para Responsáveis)</option>
+                                    @foreach ($paroquias as $paroquia)
+                                        <option value="{{ $paroquia->id }}" {{ old('paroquia_id') == $paroquia->id ? 'selected' : '' }}>
+                                            {{ $paroquia->nome }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('paroquia_id')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+
 
                         <div class="row mb-0">
                             <div class="col-md-6 offset-md-4">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Paroquia;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
@@ -12,7 +13,8 @@ class UserController extends Controller
 {
     public function createUserForm()
     {
-        return view("admin.users.create");
+        $paroquias = Paroquia::orderBy('nome')->get();
+        return view("admin.users.create", compact('paroquias'));
     }
 
     public function storeUser(Request $request)
@@ -29,6 +31,7 @@ class UserController extends Controller
             'email' => ['required', 'string', 'email', 'max:150'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'is_admin' => ['required', 'boolean'],
+            'paroquia_id' => ['nullable', 'required_if:is_addmin,0', 'exists:paroquias,id']
         ], $messages);
 
         User::create([
@@ -36,6 +39,7 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'is_admin' => $request->is_admin,
+            'paroquia_id' => $request->is_admin ? null : $request->paroquia_id,
         ]);
 
         return redirect()->route('admin.users.list')->with('success', 'Novo usuário criado com sucesso');
@@ -50,7 +54,8 @@ class UserController extends Controller
 
     public function editUser(User $user)
     {
-        return view('admin.users.edit', compact('user'));
+        $paroquias = Paroquia::orderBy('nome')->get();
+        return view('admin.users.edit', compact('user', 'paroquias'));
     }
 
     public function updateUser(Request $request, User $user)
@@ -66,11 +71,13 @@ class UserController extends Controller
             ],
             'password' => 'nullable|string|min:8|confirmed',
             'is_admin' => 'required|boolean',
+            'paroquia_id' => ['nullable', 'required_if:is_admin,0', 'exists:paroquias,id'],
         ]);
 
         $user->name = $request->name;
         $user->email = $request->email;
         $user->is_admin = $request->is_admin;
+        $user->paroquia_id = $request->is_admin ? null : $request->paroquia_id;
 
         if ($request->filled('password')) {
             $user->password = Hash::make($request->password);
