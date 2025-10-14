@@ -8,7 +8,7 @@
                 <div class="card-header">{{ __('Cadastrar Novo Usuário (Paróquia)') }}</div>
 
                 <div class="card-body">
-                    <form method="POST" action="{{ route('admin.users.store') }}" id="user-form">
+                    <form method="POST" action="{{ route('users.store') }}" id="user-form">
                         @csrf
 
                         <div class="row mb-3">
@@ -94,7 +94,7 @@
                                 <button type="submit" class="btn btn-primary" id="submit-button" disabled>
                                     Cadastrar Usuário
                                 </button>
-                                <a href="{{ route('admin.users.list') }}" class="btn btn-secondary">Cancelar</a>
+                                <a href="{{ route('users.index') }}" class="btn btn-secondary">Cancelar</a>
                             </div>
                         </div>
                     </form>

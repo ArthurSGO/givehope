@@ -1,5 +1,5 @@
 @extends('app')
-@section('title', 'Usuários')
+@section('title', 'Doadores')
 @section('content')
 <div class="container">
     @if (session('success'))
@@ -18,11 +18,11 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
-                    {{ __('Lista de Usuários do Sistema') }}
+                    {{ __('Lista de Doadores do Sistema') }}
                 </div>
                 <div class="card-body">
-                    <a href="{{ route('users.create') }}" class="btn btn-success mb-3">
-                        <i class="fa fa-plus"></i> Cadastrar Novo Usuário
+                    <a href="{{ route('doadores.create') }}" class="btn btn-success mb-3">
+                        <i class="fa fa-plus"></i> Cadastrar Novo Doador
                     </a>
                     <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary mb-3">
                         Voltar
@@ -33,42 +33,26 @@
                                 <tr>
                                     <th>ID</th>
                                     <th>Nome</th>
-                                    <th>Email</th>
-                                    <th>Status</th>
-                                    <th>Paróquia</th>
-                                    <th>Data de Criação</th>
+                                    <th>CPF/CNPJ</th>
+                                    <th>Telefone</th>
                                     <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($users as $user)
+                                @foreach ($doadores as $doador)
                                 <tr>
-                                    <td>{{ $user->id }}</td>
-                                    <td>{{ $user->name }}</td>
-                                    <td>{{ $user->email }}</td>
+                                    <td>{{ $doador->id }}</td>
+                                    <td>{{ $doador->nome }}</td>
+                                    <td>{{ $doador->cpf_cnpj }}</td>
+                                    <td>{{ $doador->telefone }}</td>
                                     <td>
-                                        @if ($user->is_admin)
-                                        <span class="badge bg-danger">Administrador Geral</span>
-                                        @else
-                                        <span class="badge bg-primary">Responsável Paróquia</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if ($user->paroquia)
-                                        {{ $user->paroquia->nome }}
-                                        @else
-                                        -
-                                        @endif
-                                    </td>
-                                    <td>{{ $user->created_at->format('d/m/Y H:i') }}</td>
-                                    <td>
-                                        <a href="{{ route('users.edit', $user->id) }}" class="btn btn-primary btn-sm m-1">
+                                        <a href="{{ route('doadores.edit', $doador->id) }}" class="btn btn-primary btn-sm m-1">
                                             <i class="fa-solid fa-pen-to-square"></i> Editar
                                         </a>
                                         <button type="button" class="btn btn-danger btn-sm m-1"
                                             data-bs-toggle="modal"
                                             data-bs-target="#confirmDeleteModal"
-                                            data-delete-url="{{ route('users.destroy', $user->id) }}">
+                                            data-delete-url="{{ route('doadores.destroy', $doador->id) }}">
                                             <i class="fa-solid fa-trash"></i> Excluir
                                         </button>
                                     </td>

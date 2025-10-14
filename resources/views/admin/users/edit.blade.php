@@ -8,7 +8,7 @@
                 <div class="card-header">Editando Usuário: {{ $user->name }}</div>
 
                 <div class="card-body">
-                    <form method="POST" action="{{ route('admin.users.update', $user->id) }}" id="user-form">
+                    <form method="POST" action="{{ route('users.update', $user->id) }}" id="user-form">
                         @csrf
                         @method('PUT')
 
@@ -91,7 +91,7 @@
                                 <button type="submit" class="btn btn-success">
                                     Salvar Alterações
                                 </button>
-                                <a href="{{ route('admin.users.list') }}" class="btn btn-secondary">Cancelar</a>
+                                <a href="{{ route('users.index') }}" class="btn btn-secondary">Cancelar</a>
                             </div>
                         </div>
                     </form>

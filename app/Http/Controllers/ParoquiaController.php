@@ -8,33 +8,17 @@ use Illuminate\Validation\Rule;
 
 class ParoquiaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         $paroquias = Paroquia::all();
         return view('admin.paroquias.list', compact('paroquias'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         return view('admin.paroquias.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
 
@@ -59,35 +43,16 @@ class ParoquiaController extends Controller
             ->with('success', 'Paróquia cadastrada com sucesso!');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         //
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit(Paroquia $paroquia)
     {
         return view('admin.paroquias.edit', compact('paroquia'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, Paroquia $paroquia)
     {
         $request->validate([
@@ -105,12 +70,6 @@ class ParoquiaController extends Controller
             ->with('success', 'Paróquia atualizada com sucesso!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Paroquia $paroquia)
     {
         $paroquia->delete();

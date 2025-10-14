@@ -11,13 +11,13 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function createUserForm()
+    public function create()
     {
         $paroquias = Paroquia::orderBy('nome')->get();
         return view("admin.users.create", compact('paroquias'));
     }
 
-    public function storeUser(Request $request)
+    public function store(Request $request)
     {
         $messages = [
             'required' => 'O campo :attribute é obrigatório. Por favor, preencha-o.',
@@ -42,23 +42,23 @@ class UserController extends Controller
             'paroquia_id' => $request->is_admin ? null : $request->paroquia_id,
         ]);
 
-        return redirect()->route('admin.users.list')->with('success', 'Novo usuário criado com sucesso');
+        return redirect()->route('users.index')->with('success', 'Novo usuário criado com sucesso');
     }
 
-    public function listUser()
+    public function index()
     {
         $users = User::all();
 
         return view('admin.users.list', compact('users'));
     }
 
-    public function editUser(User $user)
+    public function edit(User $user)
     {
         $paroquias = Paroquia::orderBy('nome')->get();
-        return view('admin.users.edit', compact('user', 'paroquias'));
+        return view('users.edit', compact('user', 'paroquias'));
     }
 
-    public function updateUser(Request $request, User $user)
+    public function update(Request $request, User $user)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -85,11 +85,11 @@ class UserController extends Controller
 
         $user->save();
 
-        return redirect()->route('admin.users.list')
+        return redirect()->route('users.index')
             ->with('success', 'Usuário atualizado com sucesso!');
     }
 
-    public function deleteUser(User $user)
+    public function destroy(User $user)
     {
         if (auth()->user()->id == $user->id) {
             return back()->with('error', 'Você não pode excluir sua própria conta');
@@ -97,7 +97,7 @@ class UserController extends Controller
 
         $user->delete();
 
-        return redirect()->route('admin.users.list')
+        return redirect()->route('users.index')
             ->with('success', 'Usuário excluido com sucesso!');
     }
 }
