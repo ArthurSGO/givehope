@@ -24,22 +24,25 @@ class UserController extends Controller
             'email.unique' => 'Este email já está sendo utilizado.',
             'name.regex' => 'O campo Nome não pode conter números.',
             'password.min' => 'A senha deve ter no mínimo 8 caracteres',
+            'paroquia_id.required_if' => 'É obrigatório selecionar uma paróquia para um usuário do tipo "Responsável".',
         ];
 
         $request->validate([
             'name' => ['required', 'string', 'max:255', 'regex:/^[a-zA-Z\sáéíóúÁÉÍÓÚçÇãõÃÕàèìòùÀÈÌÒÙº\.\-]+$/u'],
-            'email' => ['required', 'string', 'email', 'max:150'],
+            'email' => ['required', 'string', 'email', 'max:150', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'is_admin' => ['required', 'boolean'],
-            'paroquia_id' => ['nullable', 'required_if:is_addmin,0', 'exists:paroquias,id']
+            'paroquia_id' => ['nullable', 'required_if:is_admin,0', 'exists:paroquias,id']
         ], $messages);
+
+        $isAdmin = $request->input('is_admin') == '1';
 
         User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'is_admin' => $request->is_admin,
-            'paroquia_id' => $request->is_admin ? null : $request->paroquia_id,
+            'is_admin' => $isAdmin,
+            'paroquia_id' => $isAdmin ? null : $request->paroquia_id,
         ]);
 
         return redirect()->route('users.index')->with('success', 'Novo usuário criado com sucesso');
@@ -71,7 +74,7 @@ class UserController extends Controller
             ],
             'password' => 'nullable|string|min:8|confirmed',
             'is_admin' => 'required|boolean',
-            'paroquia_id' => ['nullable', 'required_if:is_admin,0', 'exists:paroquias,id'],
+            'paroquia_id' => ['nullable', 'required_if:is_admin,0', 'exists:paroquias,id']
         ]);
 
         $user->name = $request->name;
@@ -84,6 +87,11 @@ class UserController extends Controller
         }
 
         $user->save();
+
+        if ($request->filled('redirect_to')) {
+            return redirect($request->redirect_to)
+                ->with('success', 'Usuário atualizado com sucesso!');
+        }
 
         return redirect()->route('users.index')
             ->with('success', 'Usuário atualizado com sucesso!');
