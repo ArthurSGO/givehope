@@ -11,17 +11,29 @@ class Paroquia extends Model
 
     protected $fillable = [
         'nome',
+        'nome_fantasia',
         'cnpj',
+        'abertura',
+        'porte',
+        'natureza_juridica',
+        'situacao',
         'logradouro',
+        'numero',
+        'bairro',
+        'cep',
         'cidade',
-        'email',
         'estado',
         'telefone',
-        'numero',
+        'email',
     ];
 
     public function users()
     {
         return $this->hasMany(User::class);
+    }
+
+    public function doacoes()
+    {
+        return $this->hasMany(Doacao::class);
     }
 }

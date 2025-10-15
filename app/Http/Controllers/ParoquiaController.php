@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Paroquia;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Http;
 
 class ParoquiaController extends Controller
 {
@@ -21,31 +23,60 @@ class ParoquiaController extends Controller
 
     public function store(Request $request)
     {
-
         $request->merge([
-            'cnpj' => preg_replace('/[^\d]/', '', $request->cnpj)
+            'cnpj' => preg_replace('/[^\d]/', '', $request->cnpj),
+            'telefone' => preg_replace('/[^\d]/', '', $request->telefone),
         ]);
 
-        $request->validate([
-            'nome' => 'required|string|max:255',
-            'cnpj' => 'required|string|unique:paroquias,cnpj|max:14',
-            'logradouro' => 'required|string|max:255',
-            'email' => 'nullable|string|unique:paroquias,email|max:255',
-            'cidade' => 'required|string|max:100',
-            'estado' => 'required|string|max:100',
-            'telefone' => 'required|string|max:11',
-            'numero'=> 'required|string|max:5',
+        $validatedCnpj = $request->validate([
+            'cnpj' => 'required|string|unique:paroquias,cnpj|size:14',
         ]);
 
-        Paroquia::create($request->all());
+        $response = Http::get("https://receitaws.com.br/v1/cnpj/{$validatedCnpj['cnpj']}");
+
+        $dadosParaSalvar = [];
+        if ($response->successful() && $response->json('status') === 'OK') {
+            $apiData = $response->json();
+            $dadosParaSalvar = [
+                'nome'              => $apiData['nome'],
+                'nome_fantasia'     => $apiData['fantasia'] ?? null,
+                'cnpj'              => $validatedCnpj['cnpj'],
+                'abertura'          => $apiData['abertura'] ?? null,
+                'porte'             => $apiData['porte'] ?? null,
+                'natureza_juridica' => $apiData['natureza_juridica'] ?? null,
+                'situacao'          => $apiData['situacao'] ?? null,
+                'logradouro'        => $apiData['logradouro'] ?? $request->logradouro,
+                'numero'            => $apiData['numero'] ?? $request->numero,
+                'bairro'            => $apiData['bairro'] ?? null,
+                'cep'               => preg_replace('/[^\d]/', '', $apiData['cep'] ?? ''),
+                'cidade'            => $apiData['municipio'] ?? $request->cidade,
+                'estado'            => $apiData['uf'] ?? $request->estado,
+                'telefone'          => preg_replace('/[^\d]/', '', $apiData['telefone'] ?? '') ?: $request->telefone,
+                'email'             => $apiData['email'] ?? $request->email,
+            ];
+        } else {
+            $dadosParaSalvar = $request->validate([
+                'nome' => 'required|string|max:255',
+                'cnpj' => 'required|string|unique:paroquias,cnpj|size:14',
+                'logradouro' => 'required|string|max:255',
+                'email' => 'nullable|email|max:255',
+                'cidade' => 'required|string|max:100',
+                'estado' => 'required|string|max:100',
+                'telefone' => 'nullable|string|max:11',
+                'numero' => 'nullable|string|max:10',
+            ]);
+        }
+
+        Paroquia::create($dadosParaSalvar);
 
         return redirect()->route('paroquias.index')
-            ->with('success', 'Paróquia cadastrada com sucesso!');
+                         ->with('success', 'Paróquia cadastrada com sucesso!');
     }
 
-    public function show($id)
+    public function show(Paroquia $paroquia)
     {
-        //
+        $paroquia->load(['users', 'doacoes']);
+        return view('admin.paroquias.show', compact('paroquia'));
     }
 
     public function edit(Paroquia $paroquia)
@@ -55,26 +86,32 @@ class ParoquiaController extends Controller
 
     public function update(Request $request, Paroquia $paroquia)
     {
-        $request->validate([
-            'nome' => 'required|string|max:255',
-            'cnpj' => ['required', 'string', 'max:14', Rule::unique('paroquias')->ignore($paroquia->id)],
-            'logradouro' => 'required|string|max:255',
-            'cidade' => 'required|string|max:100',
-            'estado' => 'required|string|max:100',
-            'telefone' => 'required|string|max:11',
+        $request->merge([
+            'cnpj' => preg_replace('/[^\d]/', '', $request->cnpj),
+            'telefone' => preg_replace('/[^\d]/', '', $request->telefone),
         ]);
 
+        $request->validate([
+            'nome' => 'required|string|max:255',
+            'cnpj' => ['required', 'string', 'size:14', Rule::unique('paroquias')->ignore($paroquia->id)],
+        ]);
+        
         $paroquia->update($request->all());
 
         return redirect()->route('paroquias.index')
-            ->with('success', 'Paróquia atualizada com sucesso!');
+                         ->with('success', 'Paróquia atualizada com sucesso!');
     }
 
     public function destroy(Paroquia $paroquia)
     {
-        $paroquia->delete();
-
-        return redirect()->route('paroquias.index')
-            ->with('success', 'Paróquia excluída com sucesso!');
+        try {
+            $paroquia->delete();
+            return redirect()->route('paroquias.index')->with('success', 'Paróquia excluída com sucesso!');
+        } catch (QueryException $e) {
+            if ($e->getCode() === '23000') {
+                return back()->with('error', 'Não é possível excluir esta paróquia, pois ela possui usuários ou outros registros associados.');
+            }
+            return back()->with('error', 'Ocorreu um erro no banco de dados ao tentar excluir a paróquia.');
+        }
     }
 }

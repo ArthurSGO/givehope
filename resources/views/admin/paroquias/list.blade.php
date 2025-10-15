@@ -48,6 +48,9 @@
                                     <td>{{ $paroquia->email }}</td>
                                     <td>{{ $paroquia->cidade }}</td>
                                     <td>
+                                        <a href="{{ route('paroquias.show', $paroquia->id) }}" class="btn btn-info btn-sm">
+                                            <i class="fa-solid fa-eye"></i> Ver
+                                        </a>
                                         <a href="{{ route('paroquias.edit', $paroquia->id) }}" class="btn btn-primary btn-sm m-1">
                                             <i class="fa-solid fa-pen-to-square"></i> Editar
                                         </a>

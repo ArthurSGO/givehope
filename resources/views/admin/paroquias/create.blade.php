@@ -131,7 +131,7 @@
                     
                     feedback.textContent = 'Dados carregados com sucesso!';
                     feedback.style.color = 'green';
-                    document.getElementById('nome').value = data.nome || '';
+                    document.getElementById('nome').value = data.fantasia || data.nome || '';
                     document.getElementById('email').value = data.email || '';
                     document.getElementById('telefone').value = (data.telefone || '').replace(/[^\d]/g, '');
                     document.getElementById('logradouro').value = data.logradouro || '';
