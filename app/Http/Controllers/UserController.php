@@ -55,7 +55,7 @@ class UserController extends Controller
     public function edit(User $user)
     {
         $paroquias = Paroquia::orderBy('nome')->get();
-        return view('users.edit', compact('user', 'paroquias'));
+        return view('admin.users.edit', compact('user', 'paroquias'));
     }
 
     public function update(Request $request, User $user)
