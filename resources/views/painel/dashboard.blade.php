@@ -1,37 +1,109 @@
 @extends('app')
 @section('title', 'Painel da Paróquia')
+
 @section('content')
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-10">
-            <div class="card">
-                <div class="card-header">
-                    Painel da Paróquia: <strong>{{ Auth::user()->paroquia->nome ?? 'Paróquia não associada' }}</strong>
-                </div>
 
+    {{-- Título da Página --}}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Painel da Paróquia: <strong>{{ Auth::user()->paroquia->nome ?? 'Não associada' }}</strong></h1>
+    </div>
+
+    {{-- Mensagem de Sucesso --}}
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    {{-- Cards de Acesso Rápido --}}
+    <div class="row">
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2" data-icon="➕">
                 <div class="card-body">
-                    @if (session('success'))
-                        <div class="alert alert-success" role="alert">
-                            {{ session('success') }}
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Ação Rápida</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">Nova Doação</div>
                         </div>
-                    @endif
-
-                    <p>Bem-vindo, {{ Auth::user()->name }}!</p>
-
-                    <hr>
-
-                    <h4>Ações Rápidas</h4>
-                    <div class="d-flex flex-wrap gap-2">
-                        <a href="{{ route('doacoes.create') }}" class="btn btn-primary">
-                            <i class="fa fa-plus"></i> Registrar Nova Doação
-                        </a>
-                        <a href="{{ route('doacoes.index') }}" class="btn btn-secondary">
-                            <i class="fa fa-list"></i> Ver Todas as Doações
-                        </a>
+                        <div class="col-auto">
+                            <i class="fas fa-plus fa-2x text-gray-300"></i>
+                        </div>
                     </div>
+                    <a href="{{ route('doacoes.create') }}" class="stretched-link"></a>
                 </div>
             </div>
         </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-secondary shadow h-100 py-2" data-icon="📋">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">
+                                Ação Rápida</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">Todas as Doações</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-list fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                    <a href="{{ route('doacoes.index') }}" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+
     </div>
+
+    {{-- CSS customizado para os cards com as suas preferências --}}
+    @push('styles')
+    <style>
+        .card .border-left-primary { border-left: 0.25rem solid #4e73df !important; }
+        .card .border-left-secondary { border-left: 0.25rem solid #858796 !important; }
+        
+        .card a.stretched-link::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .card {
+            transition: all .2s ease-in-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0.5rem 1rem rgba(0,0,0,.15)!important;
+            z-index: 10;
+        }
+
+        .card::before {
+            content: attr(data-icon);
+            position: absolute;
+            top: 70%;
+            left: 62%; /* <-- SUA PERSONALIZAÇÃO DE POSIÇÃO */
+            transform: translate(-50%, -50%);
+            font-size: 6rem;
+            color: rgba(0, 0, 0, 0.4); /* <-- SUA PERSONALIZAÇÃO DE OPACIDADE */
+            opacity: 0;
+            transition: opacity .3s ease-in-out;
+            z-index: -1;
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+    </style>
+    @endpush
+
 </div>
 @endsection
