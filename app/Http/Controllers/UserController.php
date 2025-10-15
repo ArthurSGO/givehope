@@ -63,6 +63,13 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
+        $messages = [
+            'required' => 'O campo :attribute é obrigatório. Por favor, preencha-o.',
+            'email.unique' => 'Este email já está sendo utilizado.',
+            'password.min' => 'A senha deve ter no mínimo 8 caracteres.',
+            'paroquia_id.required_if' => 'É obrigatório selecionar uma paróquia para um usuário do tipo "Responsável".',
+        ];
+
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => [
@@ -75,7 +82,7 @@ class UserController extends Controller
             'password' => 'nullable|string|min:8|confirmed',
             'is_admin' => 'required|boolean',
             'paroquia_id' => ['nullable', 'required_if:is_admin,0', 'exists:paroquias,id']
-        ]);
+        ], $messages);
 
         $user->name = $request->name;
         $user->email = $request->email;
