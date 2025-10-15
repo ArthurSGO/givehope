@@ -4,12 +4,10 @@
 @section('content')
 <div class="container">
 
-    {{-- Título da Página --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="h3 mb-0 text-gray-800">Painel da Paróquia: <strong>{{ Auth::user()->paroquia->nome ?? 'Não associada' }}</strong></h1>
     </div>
 
-    {{-- Mensagem de Sucesso --}}
     @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
@@ -17,7 +15,6 @@
         </div>
     @endif
 
-    {{-- Cards de Acesso Rápido --}}
     <div class="row">
 
         <div class="col-xl-4 col-md-6 mb-4">
@@ -58,7 +55,6 @@
 
     </div>
 
-    {{-- CSS customizado para os cards com as suas preferências --}}
     @push('styles')
     <style>
         .card .border-left-primary { border-left: 0.25rem solid #4e73df !important; }
@@ -90,10 +86,10 @@
             content: attr(data-icon);
             position: absolute;
             top: 70%;
-            left: 62%; /* <-- SUA PERSONALIZAÇÃO DE POSIÇÃO */
+            left: 62%;
             transform: translate(-50%, -50%);
             font-size: 6rem;
-            color: rgba(0, 0, 0, 0.4); /* <-- SUA PERSONALIZAÇÃO DE OPACIDADE */
+            color: rgba(0, 0, 0, 0.4);
             opacity: 0;
             transition: opacity .3s ease-in-out;
             z-index: -1;

@@ -11,7 +11,16 @@ class DoacaoController extends Controller
 {
     public function index()
     {
-        //
+        $user = Auth::user();
+
+        // Busca apenas as doações da paróquia do usuário logado.
+        // O `with('doador')` carrega os dados do doador para exibirmos o nome.
+        $doacoes = Doacao::where('paroquia_id', $user->paroquia_id)
+            ->with('doador')
+            ->latest('data_doacao')->get();
+
+        // Retorna a view com a lista de doações já filtrada.
+        return view('admin.doacoes.list', compact('doacoes'));
     }
 
     public function create()
@@ -34,19 +43,17 @@ class DoacaoController extends Controller
         $data = $request->all();
         $user = Auth::user();
 
-        if(!$user->is_admin) 
-        {
+        if (!$user->is_admin) {
             $data['paroquia_id'] = $user->paroquia_id;
         }
 
-        if($request->doador_id === '')
-        {
+        if ($request->doador_id === '') {
             $data['doador_id'] = null;
         }
 
         Doacao::create($data);
 
-        return redirect()->route('painel.dashboard')->with('success','Doação registrada com sucesso!');
+        return redirect()->route('painel.dashboard')->with('success', 'Doação registrada com sucesso!');
     }
 
     public function show($id)

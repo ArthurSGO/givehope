@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DoadorController;
 use App\Http\Controllers\DoacaoController;
+use App\Http\Controllers\LogController;
 use App\Http\Controllers\PainelController;
 use App\Http\Controllers\ParoquiaController;
 
@@ -24,6 +25,7 @@ Route::middleware(['auth', 'is_admin'])->group(function () {
     Route::get('admin', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::resource('users', UserController::class);
     Route::resource('paroquias', ParoquiaController::class);
+    Route::resource('logs', LogController::class);
 });
 
 Route::middleware(['auth'])->group(function () {

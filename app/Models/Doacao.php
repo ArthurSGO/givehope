@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Doacao extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     protected $table = 'doacoes';
     
@@ -29,5 +31,14 @@ class Doacao extends Model
     public function doador()
     {
         return $this->belongsTo(Doador::class);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['tipo', 'quantidade', 'unidade', 'descricao'])
+            ->logOnlyDirty()
+            ->setDescriptionForEvent(fn(string $eventName) => "Uma doação foi {$eventName}")
+            ->useLogName('Doações');
     }
 }
