@@ -12,7 +12,9 @@
                         @csrf
                         @method('PUT')
 
+                        @if (request('redirect_to'))
                         <input type="hidden" name="redirect_to" value="{{ request('redirect_to') }}">
+                        @endif
 
                         <div class="row mb-3">
                             <label for="name" class="col-md-4 col-form-label text-md-end">Nome</label>
@@ -93,7 +95,7 @@
                                 <button type="submit" class="btn btn-success">
                                     Salvar Alterações
                                 </button>
-                                <a href="{{ request('redirect_to', route('users.index')) }}" class="btn btn-secondary">Cancelar</a>
+                                <a href="{{ request('redirect_to' ?? route('users.index')) }}" class="btn btn-secondary">Cancelar</a>
                             </div>
                         </div>
                     </form>

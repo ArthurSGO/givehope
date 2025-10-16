@@ -60,7 +60,7 @@
                             <td>{{ $user->name }}</td>
                             <td>{{ $user->email }}</td>
                             <td>
-                                <a href="{{ route('users.edit', $user->id) }}" class="btn btn-primary btn-sm">Editar Usuário</a>
+                                <a href="{{ route('users.edit', ['user' => $user->id, 'redirect_to' => route('paroquias.show', $paroquia)]) }}" class="btn btn-primary btn-sm">Editar Usuário</a>
                             </td>
                         </tr>
                         @empty
