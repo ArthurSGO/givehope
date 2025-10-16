@@ -71,6 +71,24 @@
             </div>
         </div>
 
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2 card-icon-item" data-icon="📦">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Ação Rápida</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">Itens</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                    <a href="{{ route('items.index') }}" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     @push('styles')
@@ -124,6 +142,10 @@
 
         .card-icon-beneficiarios::before {
             top: 54%;
+        }
+
+        .card-icon-item::before {
+            top: 70%;
         }
     </style>
     @endpush

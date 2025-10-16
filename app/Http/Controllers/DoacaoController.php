@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Doacao;
 use App\Models\Doador;
+use App\Models\Item;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,20 +14,19 @@ class DoacaoController extends Controller
     {
         $user = Auth::user();
 
-        // Busca apenas as doações da paróquia do usuário logado.
-        // O `with('doador')` carrega os dados do doador para exibirmos o nome.
         $doacoes = Doacao::where('paroquia_id', $user->paroquia_id)
             ->with('doador')
             ->latest('data_doacao')->get();
 
-        // Retorna a view com a lista de doações já filtrada.
         return view('admin.doacoes.list', compact('doacoes'));
     }
 
     public function create()
     {
-        $doadores = Doador::orderBy('nome')->get();
-        return view('admin.doacoes.create', compact('doadores'));
+        $doadores = Doador::all();
+        $items = Item::orderBy('nome')->get();
+
+        return view('admin.doacoes.create', compact('doadores', 'items'));
     }
 
     public function store(Request $request)

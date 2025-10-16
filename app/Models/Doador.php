@@ -9,9 +9,15 @@ class Doador extends Model
 {
     use HasFactory;
 
-protected $table = 'doadores';
+    protected $table = 'doadores';
 
     protected $fillable = [
-        "nome","cpf_cnpj","telefone","logradouro","numero","cidade", "estado",
+        'nome',
+        'cpf_cnpj',
+        'telefone',
+        'logradouro',
+        'numero',
+        'cidade',
+        'estado',
     ];
 }

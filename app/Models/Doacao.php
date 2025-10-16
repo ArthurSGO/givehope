@@ -12,7 +12,7 @@ class Doacao extends Model
     use HasFactory, LogsActivity;
 
     protected $table = 'doacoes';
-    
+
     protected $fillable = [
         'paroquia_id',
         'doador_id',
@@ -40,5 +40,12 @@ class Doacao extends Model
             ->logOnlyDirty()
             ->setDescriptionForEvent(fn(string $eventName) => "Uma doação foi {$eventName}")
             ->useLogName('Doações');
+    }
+
+    public function items()
+    {
+        return $this->belongsToMany(Item::class, 'doacao_item')
+            ->withPivot('quantidade', 'unidade') // Informa que a tabela pivot tem colunas extras
+            ->withTimestamps();
     }
 }
