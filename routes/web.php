@@ -9,6 +9,7 @@ use App\Http\Controllers\DoacaoController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\PainelController;
 use App\Http\Controllers\ParoquiaController;
+use App\Http\Controllers\BeneficiarioController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +32,7 @@ Route::middleware(['auth', 'is_admin'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::resource('doadores', DoadorController::class);
     Route::resource('doacoes', DoacaoController::class);
+    Route::resource('beneficiarios', BeneficiarioController::class);
     Route::get('/painel', [PainelController::class, 'index'])->name('painel.dashboard');
 });
 
