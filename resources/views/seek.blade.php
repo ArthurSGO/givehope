@@ -1,4 +1,4 @@
 @extends('app')
-@section('title', 'Em Breve')
+@section('title', 'Consultar')
 @section('content')
 @endsection

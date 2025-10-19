@@ -31,6 +31,7 @@
                             <div class="form-check mb-2">
                                 <input class="form-check-input" type="checkbox" id="doacao_anonima_checkbox" name="doacao_anonima">
                                 <label class="form-check-label" for="doacao_anonima_checkbox">É uma Doação Anônima?</label>
+                                <span id="anonima-aviso-item" class="text-danger ms-2" style="display: none;"></span>
                             </div>
                             <div id="doador-search-section">
                                 <label for="cpf_cnpj_busca" class="form-label">Buscar Doador por CPF/CNPJ</label>
@@ -66,6 +67,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <input type="hidden" id="hidden-money" name="unidade" value="R$">
                         </div>
 
                         <div id="item-donation-section" style="display: none;">
@@ -133,6 +135,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 
 <script>
+    
 $(document).ready(function() {
     $('#cpf_cnpj_busca').mask(function(val) {
         return val.replace(/\D/g, '').length === 14 ? '00.000.000/0000-00' : '000.000.000-00999';
@@ -148,12 +151,18 @@ $(document).ready(function() {
     const itemOption = tipoSelect.querySelector('option[value="item"]');
     const itemSelect = document.getElementById('item_id');
     const newItemWrapper = document.getElementById('new-item-wrapper');
+    const anonimaAvisoItem = document.getElementById('anonima-aviso-item');
 
     function toggleDonationSections() {
         if (tipoSelect.value === 'dinheiro') {
+            anonimaCheckbox.style.display = 'block'
+            anonimaAvisoItem.style.display = 'none';
             moneySection.style.display = 'block';
             itemSection.style.display = 'none';
         } else {
+            anonimaCheckbox.style.display = 'none'
+            anonimaAvisoItem.textContent = 'Não permitido para doação de Itens.';
+            anonimaAvisoItem.style.display = 'inline';
             moneySection.style.display = 'none';
             itemSection.style.display = 'block';
         }
@@ -172,7 +181,7 @@ $(document).ready(function() {
         }
         
         toggleDonationSections();
-        submitButton.disabled = !(isAnonima || doadorSelecionado);
+        submitButton.disabled = !(doadorSelecionado);
     }
 
     itemSelect.addEventListener('change', function() {
@@ -262,6 +271,7 @@ $(document).ready(function() {
         doadorNaoEncontradoDiv.style.display = 'none';
         cpfInput.value = '';
         doadorIdInput.value = '';
+        submitButton.disabled = false;
         updateFormState();
     }
     document.getElementById('limpar-doador-btn').addEventListener('click', limparDoador);
@@ -301,5 +311,53 @@ $(document).ready(function() {
     toggleDonationSections();
     updateFormState();
 });
+
+const itemSection = document.getElementById('item-donation-section');
+const hiddenMoney = document.getElementById('hidden-money');
+    
+    const itemInputs = itemSection.querySelectorAll('input, select, textarea');
+
+
+    function toggleTipoDoacao() {
+        const tipo = tipoDoacao.value;
+        
+        if (tipo === 'dinheiro') {
+            
+            moneySection.style.display = 'block';
+            
+            itemSection.style.display = 'none';
+
+            hiddenMoney.disabled = false;
+            hiddenMoney.value = 'R$'; 
+
+            itemInputs.forEach(input => {
+                input.disabled = true;
+            });
+
+        } else if (tipo === 'item') {
+
+            itemSection.style.display = 'block';
+            
+            moneySection.style.display = 'none';
+
+            hiddenMoney.disabled = true;
+
+            itemInputs.forEach(input => {
+                input.disabled = false;
+            });
+            
+            const itemUnidadeSelect = document.getElementById('item_unidade');
+            Array.from(itemUnidadeSelect.options).forEach(option => {
+                if (option.value === 'R$') {
+                    option.remove();
+                }
+            });
+            if (!Array.from(itemUnidadeSelect.options).some(opt => opt.value === 'R$')) {
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', toggleTipoDoacao);
+    tipoDoacao.addEventListener('change', toggleTipoDoacao);
 </script>
 @endpush

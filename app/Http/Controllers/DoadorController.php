@@ -94,26 +94,21 @@ class DoadorController extends Controller
             ->with('success', 'Doador excluído com sucesso!');
     }
 
-    public function buscarPorCpfCnpj(Request $request)
+    public function buscar(Request $request)
     {
-        // 1. Valida se o parâmetro foi enviado
-        $request->validate(['cpf_cnpj' => 'required|string']);
 
-        // 2. Pega o valor enviado (pode estar com ou sem máscara)
+        $cpfCnpjInput = $request->query('cpf_cnpj');
+
         $cpfCnpjInput = $request->input('cpf_cnpj');
 
-        // 3. Remove QUALQUER caractere que não seja um número
         $cpfCnpjLimpo = preg_replace('/[^0-9]/', '', $cpfCnpjInput);
 
-        // 4. Se depois da limpeza não sobrar nada, retorna erro
         if (empty($cpfCnpjLimpo)) {
             return response()->json(['error' => 'CPF/CNPJ inválido.'], 400);
         }
 
-        // 5. Busca no banco de dados ONDE a coluna 'cpf_cnpj' é IGUAL ao valor limpo
         $doador = Doador::where('cpf_cnpj', $cpfCnpjLimpo)->first();
 
-        // 6. Responde com sucesso ou erro
         if ($doador) {
             return response()->json([
                 'id' => $doador->id,
