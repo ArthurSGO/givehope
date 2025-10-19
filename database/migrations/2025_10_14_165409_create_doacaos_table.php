@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('doador_id')->nullable()->constrained('doadores');
             $table->enum('tipo', ['dinheiro', 'item']);
             $table->string('descricao')->nullable();
-            $table->decimal('quantidade', 12, 2);
+            $table->decimal('quantidade', 12, 2)->nullable();
             $table->enum('unidade', ['R$', 'Unidade', 'Kg']);
             $table->date('data_doacao');
             $table->timestamps();

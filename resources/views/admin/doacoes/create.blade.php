@@ -65,10 +65,12 @@
                                         <span class="input-group-text">R$</span>
                                         <input type="number" step="0.01" class="form-control" id="quantidade_dinheiro" name="quantidade">
                                     </div>
+                                    <input type="hidden" name="unidade_dinheiro" id="unidade_dinheiro" value="R$">
                                 </div>
                             </div>
-                            <input type="hidden" id="hidden-money" name="unidade" value="R$">
                         </div>
+
+                            <input type="hidden" name="unidade" id="doacao_unidade_input">
 
                         <div id="item-donation-section" style="display: none;">
                             <div class="card bg-light p-3">
@@ -152,19 +154,29 @@ $(document).ready(function() {
     const itemSelect = document.getElementById('item_id');
     const newItemWrapper = document.getElementById('new-item-wrapper');
     const anonimaAvisoItem = document.getElementById('anonima-aviso-item');
+    const itemInputs = itemSection.querySelectorAll('input, select, textarea');
 
     function toggleDonationSections() {
+        
+        const doacaoUnidadeInput = document.getElementById('doacao_unidade_input');
+
         if (tipoSelect.value === 'dinheiro') {
             anonimaCheckbox.style.display = 'block'
             anonimaAvisoItem.style.display = 'none';
             moneySection.style.display = 'block';
             itemSection.style.display = 'none';
+            doacaoUnidadeInput.name = 'unidade';
+            doacaoUnidadeInput.value = 'R$';
+            doacaoUnidadeInput.disabled = false;
         } else {
             anonimaCheckbox.style.display = 'none'
             anonimaAvisoItem.textContent = 'Não permitido para doação de Itens.';
             anonimaAvisoItem.style.display = 'inline';
             moneySection.style.display = 'none';
             itemSection.style.display = 'block';
+            doacaoUnidadeInput.name = 'unidade';
+            doacaoUnidadeInput.value = '';
+            doacaoUnidadeInput.disabled = true;
         }
     }
 
@@ -232,9 +244,11 @@ $(document).ready(function() {
 
         let hiddenInputs;
         if (itemId === 'new') {
-            hiddenInputs = `<input type="hidden" name="items[${itemCounter}][new_item_name]" value="${newItemName}">`;
+            hiddenInputs = `<input type="hidden" name="items[${itemCounter}][item_id]" value="new">`;
+            hiddenInputs += `<input type="hidden" name="items[${itemCounter}][new_item_name]" value="${newItemName}">`;
         } else {
             hiddenInputs = `<input type="hidden" name="items[${itemCounter}][item_id]" value="${itemId}">`;
+            hiddenInputs += `<input type="hidden" name="items[${itemCounter}][new_item_name]" value="">`;
         }
         hiddenInputs += `
             <input type="hidden" name="items[${itemCounter}][quantidade]" value="${quantidade}">
@@ -311,53 +325,5 @@ $(document).ready(function() {
     toggleDonationSections();
     updateFormState();
 });
-
-const itemSection = document.getElementById('item-donation-section');
-const hiddenMoney = document.getElementById('hidden-money');
-    
-    const itemInputs = itemSection.querySelectorAll('input, select, textarea');
-
-
-    function toggleTipoDoacao() {
-        const tipo = tipoDoacao.value;
-        
-        if (tipo === 'dinheiro') {
-            
-            moneySection.style.display = 'block';
-            
-            itemSection.style.display = 'none';
-
-            hiddenMoney.disabled = false;
-            hiddenMoney.value = 'R$'; 
-
-            itemInputs.forEach(input => {
-                input.disabled = true;
-            });
-
-        } else if (tipo === 'item') {
-
-            itemSection.style.display = 'block';
-            
-            moneySection.style.display = 'none';
-
-            hiddenMoney.disabled = true;
-
-            itemInputs.forEach(input => {
-                input.disabled = false;
-            });
-            
-            const itemUnidadeSelect = document.getElementById('item_unidade');
-            Array.from(itemUnidadeSelect.options).forEach(option => {
-                if (option.value === 'R$') {
-                    option.remove();
-                }
-            });
-            if (!Array.from(itemUnidadeSelect.options).some(opt => opt.value === 'R$')) {
-            }
-        }
-    }
-
-    document.addEventListener('DOMContentLoaded', toggleTipoDoacao);
-    tipoDoacao.addEventListener('change', toggleTipoDoacao);
 </script>
 @endpush
