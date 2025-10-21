@@ -31,6 +31,7 @@
                             <div class="form-check mb-2">
                                 <input class="form-check-input" type="checkbox" id="doacao_anonima_checkbox" name="doacao_anonima">
                                 <label class="form-check-label" for="doacao_anonima_checkbox">É uma Doação Anônima?</label>
+                                <span id="anonima-aviso-item" class="text-danger ms-2" style="display: none;"></span>
                             </div>
                             <div id="doador-search-section">
                                 <label for="cpf_cnpj_busca" class="form-label">Buscar Doador por CPF/CNPJ</label>
@@ -64,9 +65,12 @@
                                         <span class="input-group-text">R$</span>
                                         <input type="number" step="0.01" class="form-control" id="quantidade_dinheiro" name="quantidade">
                                     </div>
+                                    <input type="hidden" name="unidade_dinheiro" id="unidade_dinheiro" value="R$">
                                 </div>
                             </div>
                         </div>
+
+                            <input type="hidden" name="unidade" id="doacao_unidade_input">
 
                         <div id="item-donation-section" style="display: none;">
                             <div class="card bg-light p-3">
@@ -133,6 +137,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 
 <script>
+    
 $(document).ready(function() {
     $('#cpf_cnpj_busca').mask(function(val) {
         return val.replace(/\D/g, '').length === 14 ? '00.000.000/0000-00' : '000.000.000-00999';
@@ -148,14 +153,30 @@ $(document).ready(function() {
     const itemOption = tipoSelect.querySelector('option[value="item"]');
     const itemSelect = document.getElementById('item_id');
     const newItemWrapper = document.getElementById('new-item-wrapper');
+    const anonimaAvisoItem = document.getElementById('anonima-aviso-item');
+    const itemInputs = itemSection.querySelectorAll('input, select, textarea');
 
     function toggleDonationSections() {
+        
+        const doacaoUnidadeInput = document.getElementById('doacao_unidade_input');
+
         if (tipoSelect.value === 'dinheiro') {
+            anonimaCheckbox.style.display = 'block'
+            anonimaAvisoItem.style.display = 'none';
             moneySection.style.display = 'block';
             itemSection.style.display = 'none';
+            doacaoUnidadeInput.name = 'unidade';
+            doacaoUnidadeInput.value = 'R$';
+            doacaoUnidadeInput.disabled = false;
         } else {
+            anonimaCheckbox.style.display = 'none'
+            anonimaAvisoItem.textContent = 'Não permitido para doação de Itens.';
+            anonimaAvisoItem.style.display = 'inline';
             moneySection.style.display = 'none';
             itemSection.style.display = 'block';
+            doacaoUnidadeInput.name = 'unidade';
+            doacaoUnidadeInput.value = '';
+            doacaoUnidadeInput.disabled = true;
         }
     }
 
@@ -172,7 +193,7 @@ $(document).ready(function() {
         }
         
         toggleDonationSections();
-        submitButton.disabled = !(isAnonima || doadorSelecionado);
+        submitButton.disabled = !(doadorSelecionado);
     }
 
     itemSelect.addEventListener('change', function() {
@@ -223,9 +244,11 @@ $(document).ready(function() {
 
         let hiddenInputs;
         if (itemId === 'new') {
-            hiddenInputs = `<input type="hidden" name="items[${itemCounter}][new_item_name]" value="${newItemName}">`;
+            hiddenInputs = `<input type="hidden" name="items[${itemCounter}][item_id]" value="new">`;
+            hiddenInputs += `<input type="hidden" name="items[${itemCounter}][new_item_name]" value="${newItemName}">`;
         } else {
             hiddenInputs = `<input type="hidden" name="items[${itemCounter}][item_id]" value="${itemId}">`;
+            hiddenInputs += `<input type="hidden" name="items[${itemCounter}][new_item_name]" value="">`;
         }
         hiddenInputs += `
             <input type="hidden" name="items[${itemCounter}][quantidade]" value="${quantidade}">
@@ -262,6 +285,7 @@ $(document).ready(function() {
         doadorNaoEncontradoDiv.style.display = 'none';
         cpfInput.value = '';
         doadorIdInput.value = '';
+        submitButton.disabled = false;
         updateFormState();
     }
     document.getElementById('limpar-doador-btn').addEventListener('click', limparDoador);
