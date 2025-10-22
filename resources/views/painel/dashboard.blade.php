@@ -5,7 +5,7 @@
 <div class="container">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Painel da Paróquia: <strong>{{ Auth::user()->paroquia->nome ?? 'Não associada' }}</strong></h1>
+        <h1 class="h3 mb-0 text-gray-800">Painel da Paróquia: <strong>{{ Auth::user()->paroquia->nome_fantasia ?? 'Não associada' }}</strong></h1>
     </div>
 
     @if (session('success'))
