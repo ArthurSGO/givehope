@@ -127,7 +127,13 @@ class DoacaoController extends Controller
 
     public function show($id)
     {
-        //
+        $user = Auth::user();
+
+        $doacao = Doacao::with(['doador', 'items'])
+            ->where('paroquia_id', $user->paroquia_id)
+            ->findOrFail($id);
+
+        return view('admin.doacoes.show', compact('doacao'));
     }
 
     public function edit($id)
