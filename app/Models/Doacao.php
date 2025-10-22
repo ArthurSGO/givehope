@@ -38,14 +38,23 @@ class Doacao extends Model
         return LogOptions::defaults()
             ->logOnly(['tipo', 'quantidade', 'unidade', 'descricao'])
             ->logOnlyDirty()
-            ->setDescriptionForEvent(fn(string $eventName) => "Uma doação foi {$eventName}")
-            ->useLogName('Doações');
+            ->setDescriptionForEvent(function (string $eventName) {
+                if ($eventName === 'updated') {
+                    return 'Uma doação foi atualizada';
+                }
+                if ($eventName === 'deleted') {
+                    return 'Uma doação foi excluída';
+                }
+                return "Uma doação foi {$eventName}";
+            })
+            ->useLogName('Doações')
+            ->dontSubmitEmptyLogs();
     }
 
     public function items()
     {
         return $this->belongsToMany(Item::class, 'doacao_item')
-            ->withPivot('quantidade', 'unidade') // Informa que a tabela pivot tem colunas extras
+            ->withPivot('quantidade', 'unidade')
             ->withTimestamps();
     }
 }

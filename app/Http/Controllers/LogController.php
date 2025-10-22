@@ -9,9 +9,14 @@ class LogController extends Controller
 {
     public function index()
     {
-        $activities = Activity::with('causer')->latest()->get();
+        $logs = Activity::with(['subject' => function ($query) {
+            $query->with(['doador:id,nome', 'items:id,nome']);
+        }, 'causer'])
+            ->where('log_name', 'Doações')
+            ->latest()
+            ->paginate(15);
 
-        return view('admin.logs.list', compact('activities'));
+        return view('admin.logs.list', compact('logs'));
     }
 
     public function create()

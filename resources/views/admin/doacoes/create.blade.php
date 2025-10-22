@@ -70,7 +70,7 @@
                             </div>
                         </div>
 
-                            <input type="hidden" name="unidade" id="doacao_unidade_input">
+                        <input type="hidden" name="unidade" id="doacao_unidade_input">
 
                         <div id="item-donation-section" style="display: none;">
                             <div class="card bg-light p-3">
@@ -82,11 +82,11 @@
                                             <option value="">Selecione um item...</option>
                                             <option value="new">--- Cadastrar Novo Item ---</option>
                                             @foreach ($items as $item)
-                                                <option value="{{ $item->id }}">{{ $item->nome }}</option>
+                                            <option value="{{ $item->id }}">{{ $item->nome }}</option>
                                             @endforeach
                                         </select>
                                     </div>
-                                    
+
                                     <div class="col-md-5" id="new-item-wrapper" style="display: none;">
                                         <label for="new_item_name" class="form-label">Nome do Novo Item</label>
                                         <input type="text" id="new_item_name" class="form-control">
@@ -137,188 +137,197 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 
 <script>
-$(document).ready(function() {
-    var maskBehavior = function(val) {
-        return val.replace(/\D/g, '').length === 14 ? '00.000.000/0000-00' : '000.000.000-00999';
-    };
-    $('#cpf_cnpj_busca').mask(maskBehavior, {
-        onKeyPress: function(val, e, field, options) {
-            field.mask(maskBehavior.apply({}, arguments), options);
-        }
-    });
+    $(document).ready(function() {
+        var maskBehavior = function(val) {
+            return val.replace(/\D/g, '').length === 14 ? '00.000.000/0000-00' : '000.000.000-00999';
+        };
+        $('#cpf_cnpj_busca').mask(maskBehavior, {
+            onKeyPress: function(val, e, field, options) {
+                field.mask(maskBehavior.apply({}, arguments), options);
+            }
+        });
 
-    const tipoSelect = document.getElementById('tipo');
-    const moneySection = document.getElementById('money-donation-section');
-    const itemSection = document.getElementById('item-donation-section');
-    const anonimaCheckbox = document.getElementById('doacao_anonima_checkbox');
-    const anonimaCheckWrapper = anonimaCheckbox.closest('.form-check');
-    const doadorSearchSection = document.getElementById('doador-search-section');
-    const doadorIdInput = document.getElementById('doador_id');
-    const submitButton = document.getElementById('submit-button');
-    const itemOption = tipoSelect.querySelector('option[value="item"]');
-    const itemSelect = document.getElementById('item_id');
-    const newItemWrapper = document.getElementById('new-item-wrapper');
-    const quantidadeDinheiroInput = document.getElementById('quantidade_dinheiro');
+        const tipoSelect = document.getElementById('tipo');
+        const moneySection = document.getElementById('money-donation-section');
+        const itemSection = document.getElementById('item-donation-section');
+        const anonimaCheckbox = document.getElementById('doacao_anonima_checkbox');
+        const anonimaCheckWrapper = anonimaCheckbox.closest('.form-check');
+        const doadorSearchSection = document.getElementById('doador-search-section');
+        const doadorIdInput = document.getElementById('doador_id');
+        const submitButton = document.getElementById('submit-button');
+        const itemOption = tipoSelect.querySelector('option[value="item"]');
+        const itemSelect = document.getElementById('item_id');
+        const newItemWrapper = document.getElementById('new-item-wrapper');
+        const quantidadeDinheiroInput = document.getElementById('quantidade_dinheiro');
 
-    function toggleDonationSections() {
-        const isDinheiro = tipoSelect.value === 'dinheiro';
-        moneySection.style.display = isDinheiro ? 'block' : 'none';
-        itemSection.style.display = isDinheiro ? 'none' : 'block';
-        anonimaCheckWrapper.style.display = isDinheiro ? 'block' : 'none';
-        
-        quantidadeDinheiroInput.required = isDinheiro;
-        quantidadeDinheiroInput.disabled = !isDinheiro;
+        function toggleDonationSections() {
+            const isDinheiro = tipoSelect.value === 'dinheiro';
+            moneySection.style.display = isDinheiro ? 'block' : 'none';
+            itemSection.style.display = isDinheiro ? 'none' : 'block';
+            anonimaCheckWrapper.style.display = isDinheiro ? 'block' : 'none';
 
-        if (!isDinheiro) {
-            anonimaCheckbox.checked = false;
-        }
-    }
+            quantidadeDinheiroInput.required = isDinheiro;
+            quantidadeDinheiroInput.disabled = !isDinheiro;
 
-    function updateFormState() {
-        const isAnonima = anonimaCheckbox.checked;
-        const doadorSelecionado = doadorIdInput.value !== '';
-        doadorSearchSection.style.display = isAnonima ? 'none' : 'block';
-        
-        itemOption.disabled = isAnonima; 
-        if (isAnonima && tipoSelect.value === 'item') {
-             tipoSelect.value = 'dinheiro';
+            if (!isDinheiro) {
+                anonimaCheckbox.checked = false;
+            }
         }
 
-        toggleDonationSections();
-        submitButton.disabled = !( (isAnonima && tipoSelect.value === 'dinheiro') || (!isAnonima && doadorSelecionado) );
-    }
+        function updateFormState() {
+            const isAnonima = anonimaCheckbox.checked;
+            const doadorSelecionado = doadorIdInput.value !== '';
+            const isDinheiro = tipoSelect.value === 'dinheiro';
 
-    itemSelect.addEventListener('change', function() {
-        newItemWrapper.style.display = this.value === 'new' ? 'block' : 'none';
-    });
+            doadorSearchSection.style.display = isAnonima ? 'none' : 'block';
 
-    const addItemBtn = document.getElementById('add-item-btn');
-    const itemList = document.getElementById('item-list');
-    const emptyItemList = document.getElementById('empty-item-list');
-    let itemCounter = 0;
+            itemOption.disabled = isAnonima;
+            if (isAnonima && !isDinheiro) {
+                tipoSelect.value = 'dinheiro';
+            }
 
-    addItemBtn.addEventListener('click', function() {
-        const quantidadeInput = document.getElementById('item_quantidade');
-        const unidadeSelect = document.getElementById('item_unidade');
-        let itemId = itemSelect.value;
-        let itemName = '';
-        let newItemName = '';
+            toggleDonationSections();
 
-        if (itemId === 'new') {
-            const newItemInput = document.getElementById('new_item_name');
-            itemName = newItemInput.value.trim();
-            newItemName = itemName;
-            if (!itemName) {
-                alert('Por favor, digite o nome do novo item.');
+            submitButton.disabled = !((isAnonima && isDinheiro) || (!isAnonima && doadorSelecionado));
+        }
+
+        itemSelect.addEventListener('change', function() {
+            newItemWrapper.style.display = this.value === 'new' ? 'block' : 'none';
+        });
+
+        const addItemBtn = document.getElementById('add-item-btn');
+        const itemList = document.getElementById('item-list');
+        const emptyItemList = document.getElementById('empty-item-list');
+        let itemCounter = 0;
+
+        addItemBtn.addEventListener('click', function() {
+            const quantidadeInput = document.getElementById('item_quantidade');
+            const unidadeSelect = document.getElementById('item_unidade');
+            let itemId = itemSelect.value;
+            let itemName = '';
+            let newItemName = '';
+
+            if (itemId === 'new') {
+                const newItemInput = document.getElementById('new_item_name');
+                itemName = newItemInput.value.trim();
+                newItemName = itemName;
+                if (!itemName) {
+                    alert('Por favor, digite o nome do novo item.');
+                    return;
+                }
+            } else if (itemId) {
+                itemName = itemSelect.options[itemSelect.selectedIndex].text;
+            } else {
+                alert('Por favor, selecione um item ou cadastre um novo.');
                 return;
             }
-        } else if (itemId) {
-             itemName = itemSelect.options[itemSelect.selectedIndex].text;
-        } else {
-             alert('Por favor, selecione um item ou cadastre um novo.');
-             return;
-        }
-        
-        const quantidade = quantidadeInput.value;
-        const unidade = unidadeSelect.value;
 
-        if (!quantidade || parseFloat(quantidade) <= 0) {
-            alert('Por favor, informe uma quantidade válida.');
-            return;
-        }
+            const quantidade = quantidadeInput.value;
+            const unidade = unidadeSelect.value;
 
-        if (emptyItemList) { emptyItemList.style.display = 'none'; }
+            if (!quantidade || parseFloat(quantidade) <= 0) {
+                alert('Por favor, informe uma quantidade válida.');
+                return;
+            }
 
-        const listItem = document.createElement('li');
-        listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
-        listItem.innerHTML = `
+            if (emptyItemList) {
+                emptyItemList.style.display = 'none';
+            }
+
+            const listItem = document.createElement('li');
+            listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+            listItem.innerHTML = `
             <span>${itemName} - <strong>${quantidade} ${unidade}</strong></span>
             <button type="button" class="btn-close" aria-label="Remove"></button>
         `;
 
-        let hiddenInputs;
-        if (itemId === 'new') {
-            hiddenInputs = `<input type="hidden" name="items[${itemCounter}][item_id]" value="new">`;
-            hiddenInputs += `<input type="hidden" name="items[${itemCounter}][new_item_name]" value="${newItemName}">`;
-        } else {
-            hiddenInputs = `<input type="hidden" name="items[${itemCounter}][item_id]" value="${itemId}">`;
-             hiddenInputs += `<input type="hidden" name="items[${itemCounter}][new_item_name]" value="">`;
-        }
-        hiddenInputs += `
+            let hiddenInputs;
+            if (itemId === 'new') {
+                hiddenInputs = `<input type="hidden" name="items[${itemCounter}][item_id]" value="new">`;
+                hiddenInputs += `<input type="hidden" name="items[${itemCounter}][new_item_name]" value="${newItemName}">`;
+            } else {
+                hiddenInputs = `<input type="hidden" name="items[${itemCounter}][item_id]" value="${itemId}">`;
+                hiddenInputs += `<input type="hidden" name="items[${itemCounter}][new_item_name]" value="">`;
+            }
+            hiddenInputs += `
             <input type="hidden" name="items[${itemCounter}][quantidade]" value="${quantidade}">
             <input type="hidden" name="items[${itemCounter}][unidade]" value="${unidade}">
         `;
-        listItem.insertAdjacentHTML('beforeend', hiddenInputs);
-        
-        listItem.querySelector('.btn-close').addEventListener('click', function() {
-            listItem.remove();
-            if (itemList.children.length === 1) {
-                emptyItemList.style.display = 'block';
-            }
+            listItem.insertAdjacentHTML('beforeend', hiddenInputs);
+
+            listItem.querySelector('.btn-close').addEventListener('click', function() {
+                listItem.remove();
+                if (itemList.children.length === 1) {
+                    emptyItemList.style.display = 'block';
+                }
+            });
+
+            itemList.appendChild(listItem);
+            itemSelect.value = '';
+            newItemWrapper.style.display = 'none';
+            document.getElementById('new_item_name').value = '';
+            quantidadeInput.value = '';
+            itemCounter++;
         });
 
-        itemList.appendChild(listItem);
-        itemSelect.value = '';
-        newItemWrapper.style.display = 'none';
-        document.getElementById('new_item_name').value = '';
-        quantidadeInput.value = '';
-        itemCounter++;
-    });
+        tipoSelect.addEventListener('change', updateFormState);
+        anonimaCheckbox.addEventListener('change', updateFormState);
 
-    tipoSelect.addEventListener('change', updateFormState);
-    anonimaCheckbox.addEventListener('change', updateFormState);
+        const buscarBtn = document.getElementById('buscar-doador-btn');
+        const doadorEncontradoDiv = document.getElementById('doador-encontrado');
+        const doadorNaoEncontradoDiv = document.getElementById('doador-nao-encontrado');
+        const doadorNomeSpan = document.getElementById('doador-nome');
+        const cpfInput = document.getElementById('cpf_cnpj_busca');
 
-    const buscarBtn = document.getElementById('buscar-doador-btn');
-    const doadorEncontradoDiv = document.getElementById('doador-encontrado');
-    const doadorNaoEncontradoDiv = document.getElementById('doador-nao-encontrado');
-    const doadorNomeSpan = document.getElementById('doador-nome');
-    const cpfInput = document.getElementById('cpf_cnpj_busca');
-    
-    function limparDoador() {
-        doadorEncontradoDiv.style.display = 'none';
-        doadorNaoEncontradoDiv.style.display = 'none';
-        cpfInput.value = '';
-        doadorIdInput.value = '';
-        updateFormState();
-    }
-    
-    document.getElementById('limpar-doador-btn').addEventListener('click', limparDoador);
-    
-    buscarBtn.addEventListener('click', function() {
-        const cpfCnpj = cpfInput.value;
-        doadorNaoEncontradoDiv.style.display = 'none';
-        if (!cpfCnpj) {
-            alert('Por favor, digite um CPF ou CNPJ para buscar.');
-            return;
+        function limparDoador() {
+            doadorEncontradoDiv.style.display = 'none';
+            doadorNaoEncontradoDiv.style.display = 'none';
+            cpfInput.value = '';
+            doadorIdInput.value = '';
+            updateFormState();
         }
-        this.disabled = true;
-        this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Buscando...';
-        fetch(`{{ route('doadores.buscar') }}?cpf_cnpj=${encodeURIComponent(cpfCnpj)}`)
-            .then(response => {
-                if (response.status === 404) { throw new Error('Doador não encontrado.'); }
-                if (!response.ok) { throw new Error('Falha na requisição ao servidor.'); }
-                return response.json();
-            })
-            .then(data => {
-                doadorNomeSpan.textContent = data.nome;
-                doadorIdInput.value = data.id;
-                doadorEncontradoDiv.style.display = 'block';
-                updateFormState();
-            })
-            .catch(error => {
-                console.error('Erro na busca:', error);
-                doadorNaoEncontradoDiv.style.display = 'block';
-                doadorIdInput.value = '';
-                updateFormState();
-            })
-            .finally(() => {
-                this.disabled = false;
-                this.innerHTML = 'Buscar';
-            });
-    });
 
-    toggleDonationSections();
-    updateFormState();
-});
+        document.getElementById('limpar-doador-btn').addEventListener('click', limparDoador);
+
+        buscarBtn.addEventListener('click', function() {
+            const cpfCnpj = cpfInput.value;
+            doadorNaoEncontradoDiv.style.display = 'none';
+            if (!cpfCnpj) {
+                alert('Por favor, digite um CPF ou CNPJ para buscar.');
+                return;
+            }
+            this.disabled = true;
+            this.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Buscando...';
+            fetch(`{{ route('doadores.buscar') }}?cpf_cnpj=${encodeURIComponent(cpfCnpj)}`)
+                .then(response => {
+                    if (response.status === 404) {
+                        throw new Error('Doador não encontrado.');
+                    }
+                    if (!response.ok) {
+                        throw new Error('Falha na requisição ao servidor.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    doadorNomeSpan.textContent = data.nome;
+                    doadorIdInput.value = data.id;
+                    doadorEncontradoDiv.style.display = 'block';
+                    updateFormState();
+                })
+                .catch(error => {
+                    console.error('Erro na busca:', error);
+                    doadorNaoEncontradoDiv.style.display = 'block';
+                    doadorIdInput.value = '';
+                    updateFormState();
+                })
+                .finally(() => {
+                    this.disabled = false;
+                    this.innerHTML = 'Buscar';
+                });
+        });
+
+        toggleDonationSections();
+        updateFormState();
+    });
 </script>
 @endpush

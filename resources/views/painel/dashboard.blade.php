@@ -72,6 +72,24 @@
         </div>
 
         <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2" data-icon="🧑‍🤝‍🧑">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Ação Rápida</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">Novo Doador</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-plus fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                    <a href="{{ route('doadores.create', ['redirect_to' => route('painel.dashboard')]) }}" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
             <div class="card border-left-success shadow h-100 py-2 card-icon-item" data-icon="📦">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
@@ -146,6 +164,10 @@
 
         .card-icon-item::before {
             top: 70%;
+        }
+
+        .card .border-left-warning {
+            border-left: 0.25rem solid #f6c23e !important;
         }
     </style>
     @endpush
