@@ -32,7 +32,7 @@ class DoacaoController extends Controller
     public function store(Request $request)
     {
         $request->merge(['doacao_anonima' => $request->has('doacao_anonima')]);
-        
+
         $validatedData = $request->validate([
             'data_doacao' => 'required|date',
             'doador_id' => 'nullable|exists:doadores,id',
@@ -47,7 +47,18 @@ class DoacaoController extends Controller
             if ($request->input('tipo') !== 'dinheiro') {
                 return back()->withErrors(['tipo' => 'Doações anônimas só podem ser do tipo Dinheiro.'])->withInput();
             }
-            $doadorAnonimo = Doador::firstOrCreate(['nome' => 'Anônimo'], ['cpf_cnpj' => null]);
+            $doadorAnonimo = Doador::firstOrCreate(
+                ['nome' => 'Anônimo'],
+                [
+                    'cpf_cnpj' => null,
+                    'telefone' => null,
+                    'logradouro' => null,
+                    'cep' => null,
+                    'numero' => null,
+                    'cidade' => null,
+                    'estado' => null
+                ]
+            );
             $doadorId = $doadorAnonimo->id;
         } elseif (empty($doadorId)) {
             return back()->withErrors(['doador_id' => 'Selecione um doador ou marque a opção "Doação Anônima".'])->withInput();

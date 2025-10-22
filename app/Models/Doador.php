@@ -16,6 +16,7 @@ class Doador extends Model
         'cpf_cnpj',
         'telefone',
         'logradouro',
+        'cep',
         'numero',
         'cidade',
         'estado',

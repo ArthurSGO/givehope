@@ -43,12 +43,16 @@ class DoadorController extends Controller
         if ($request->has('cpf_cnpj')) {
             $request->merge(['cpf_cnpj' => preg_replace('/[^0-9]/', '', $request->input('cpf_cnpj'))]);
         }
+        if ($request->has('cep')) {
+            $request->merge(['cep' => preg_replace('/[^0-9]/', '', $request->input('cep'))]);
+        }
 
         $validatedData = $request->validate([
             'nome' => 'required|string|max:255',
             'cpf_cnpj' => 'nullable|string|max:14|unique:doadores,cpf_cnpj',
             'telefone' => 'nullable|string|max:11',
             'logradouro' => 'nullable|string|max:255',
+            'cep' => 'nullable|string|max:8',
             'numero' => 'nullable|string|max:20',
             'cidade' => 'nullable|string|max:255',
             'estado' => 'nullable|string|max:255',
