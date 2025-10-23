@@ -1,4 +1,8 @@
-import 'bootstrap';
+import * as bootstrap from 'bootstrap';
+
+if (typeof window !== 'undefined') {
+    window.bootstrap = bootstrap;
+}
 
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests

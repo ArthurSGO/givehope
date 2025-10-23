@@ -61,7 +61,21 @@ class DoadorController extends Controller
             'cpf_cnpj.unique' => 'Este CPF/CNPJ já está cadastrado.',
         ]);
 
-        Doador::create($validatedData);
+        $doadorData = $validatedData;
+        unset($doadorData['redirect_to']);
+
+        $doador = Doador::create($doadorData);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'Doador cadastrado com sucesso!',
+                'doador' => [
+                    'id' => $doador->id,
+                    'nome' => $doador->nome,
+                    'cpf_cnpj' => $doador->cpf_cnpj,
+                ],
+            ], 201);
+        }
 
         $redirectUrl = $request->filled('redirect_to') ? $request->input('redirect_to') : route('doadores.index');
 
@@ -118,9 +132,7 @@ class DoadorController extends Controller
     public function buscar(Request $request)
     {
 
-        $cpfCnpjInput = $request->query('cpf_cnpj');
-
-        $cpfCnpjInput = $request->input('cpf_cnpj');
+        $cpfCnpjInput = $request->query('cpf_cnpj', $request->input('cpf_cnpj'));
 
         $cpfCnpjLimpo = preg_replace('/[^0-9]/', '', $cpfCnpjInput);
 
@@ -134,6 +146,7 @@ class DoadorController extends Controller
             return response()->json([
                 'id' => $doador->id,
                 'nome' => $doador->nome,
+                'cpf_cnpj' => $doador->cpf_cnpj,
             ]);
         }
 

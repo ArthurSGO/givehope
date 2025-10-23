@@ -43,7 +43,12 @@
                                     <p class="mb-0"><strong>Doador:</strong> <span id="doador-nome"></span></p>
                                     <button type="button" class="btn btn-sm btn-link text-danger" id="limpar-doador-btn">Limpar</button>
                                 </div>
-                                <div id="doador-nao-encontrado" class="text-danger mt-2" style="display: none;">Doador não encontrado.</div>
+                                <div id="doador-nao-encontrado" class="alert alert-warning mt-2" style="display: none;">
+                                    <div id="doador-nao-encontrado-mensagem" class="mb-2">Doador não encontrado.</div>
+                                    <button type="button" class="btn btn-sm btn-primary" id="abrir-modal-doador-btn">
+                                        Cadastrar novo doador
+                                    </button>
+                                </div>
                             </div>
                             <input type="hidden" id="doador_id" name="doador_id" value="">
                         </div>
@@ -125,6 +130,72 @@
                             <a href="{{ url()->previous() }}" class="btn btn-secondary">Cancelar</a>
                         </div>
                     </form>
+                    <div class="modal fade" id="novoDoadorModal" tabindex="-1" aria-labelledby="novoDoadorModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="novoDoadorModalLabel">Cadastrar novo doador</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div id="novo-doador-errors" class="alert alert-danger d-none" role="alert"></div>
+                                    <form id="novo-doador-form">
+                                        @csrf
+                                        <div class="mb-3">
+                                            <label for="modal_nome" class="form-label">Nome completo</label>
+                                            <input type="text" class="form-control" id="modal_nome" name="nome" required>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="modal_cpf_cnpj" class="form-label">CPF ou CNPJ</label>
+                                                <input type="text" class="form-control" id="modal_cpf_cnpj" name="cpf_cnpj">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="modal_telefone" class="form-label">Telefone</label>
+                                                <input type="text" class="form-control" id="modal_telefone" name="telefone">
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <p class="text-muted">Endereço</p>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label for="modal_cep" class="form-label">CEP</label>
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" id="modal_cep" name="cep">
+                                                    <button class="btn btn-outline-secondary" type="button" id="modal_buscar_cep_btn">Buscar CEP</button>
+                                                </div>
+                                                <div id="modal_cep_error" class="text-danger small mt-1" style="display: none;"></div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-9 mb-3">
+                                                <label for="modal_logradouro" class="form-label">Logradouro</label>
+                                                <input type="text" class="form-control" id="modal_logradouro" name="logradouro">
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label for="modal_numero" class="form-label">Número</label>
+                                                <input type="text" class="form-control" id="modal_numero" name="numero">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="modal_cidade" class="form-label">Cidade</label>
+                                                <input type="text" class="form-control" id="modal_cidade" name="cidade">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="modal_estado" class="form-label">Estado</label>
+                                                <input type="text" class="form-control" id="modal_estado" name="estado">
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                    <button type="submit" form="novo-doador-form" class="btn btn-primary" id="novo-doador-submit-btn">Cadastrar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -141,11 +212,25 @@
         var maskBehavior = function(val) {
             return val.replace(/\D/g, '').length === 14 ? '00.000.000/0000-00' : '000.000.000-00999';
         };
+        var phoneMask = function(val) {
+            return val.replace(/\D/g, '').length === 11 ? '(00) 00000-0000' : '(00) 0000-00009';
+        };
         $('#cpf_cnpj_busca').mask(maskBehavior, {
             onKeyPress: function(val, e, field, options) {
                 field.mask(maskBehavior.apply({}, arguments), options);
             }
         });
+        $('#modal_cpf_cnpj').mask(maskBehavior, {
+            onKeyPress: function(val, e, field, options) {
+                field.mask(maskBehavior.apply({}, arguments), options);
+            }
+        });
+        $('#modal_telefone').mask(phoneMask, {
+            onKeyPress: function(val, e, field, options) {
+                field.mask(phoneMask.apply({}, arguments), options);
+            }
+        });
+        $('#modal_cep').mask('00000-000');
 
         const tipoSelect = document.getElementById('tipo');
         const moneySection = document.getElementById('money-donation-section');
@@ -159,6 +244,49 @@
         const itemSelect = document.getElementById('item_id');
         const newItemWrapper = document.getElementById('new-item-wrapper');
         const quantidadeDinheiroInput = document.getElementById('quantidade_dinheiro');
+        const buscarBtn = document.getElementById('buscar-doador-btn');
+        const doadorEncontradoDiv = document.getElementById('doador-encontrado');
+        const doadorNaoEncontradoDiv = document.getElementById('doador-nao-encontrado');
+        const doadorNaoEncontradoMensagem = document.getElementById('doador-nao-encontrado-mensagem');
+        const doadorNomeSpan = document.getElementById('doador-nome');
+        const cpfInput = document.getElementById('cpf_cnpj_busca');
+        const limparDoadorBtn = document.getElementById('limpar-doador-btn');
+        const abrirModalBtn = document.getElementById('abrir-modal-doador-btn');
+        const novoDoadorModalEl = document.getElementById('novoDoadorModal');
+        const bootstrapModal = window.bootstrap && window.bootstrap.Modal ? window.bootstrap.Modal : null;
+        const fallbackModal = {
+            show() {
+                novoDoadorModalEl.classList.add('show');
+                novoDoadorModalEl.style.display = 'block';
+                novoDoadorModalEl.removeAttribute('aria-hidden');
+                novoDoadorModalEl.setAttribute('aria-modal', 'true');
+                novoDoadorModalEl.removeAttribute('inert');
+                modalNomeInput.focus();
+            },
+            hide() {
+                novoDoadorModalEl.classList.remove('show');
+                novoDoadorModalEl.style.display = 'none';
+                novoDoadorModalEl.setAttribute('aria-hidden', 'true');
+                novoDoadorModalEl.removeAttribute('aria-modal');
+                novoDoadorModalEl.setAttribute('inert', 'true');
+                resetNovoDoadorForm();
+            }
+        };
+        const novoDoadorModal = bootstrapModal ? bootstrapModal.getOrCreateInstance(novoDoadorModalEl) : fallbackModal;
+        const novoDoadorForm = document.getElementById('novo-doador-form');
+        const novoDoadorErrors = document.getElementById('novo-doador-errors');
+        const novoDoadorSubmitBtn = document.getElementById('novo-doador-submit-btn');
+        const modalCpfInput = document.getElementById('modal_cpf_cnpj');
+        const modalTelefoneInput = document.getElementById('modal_telefone');
+        const modalNomeInput = document.getElementById('modal_nome');
+        const modalCepInput = document.getElementById('modal_cep');
+        const modalLogradouroInput = document.getElementById('modal_logradouro');
+        const modalNumeroInput = document.getElementById('modal_numero');
+        const modalCidadeInput = document.getElementById('modal_cidade');
+        const modalEstadoInput = document.getElementById('modal_estado');
+        const modalBuscarCepBtn = document.getElementById('modal_buscar_cep_btn');
+        const modalCepError = document.getElementById('modal_cep_error');
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
         function toggleDonationSections() {
             const isDinheiro = tipoSelect.value === 'dinheiro';
@@ -273,11 +401,19 @@
         tipoSelect.addEventListener('change', updateFormState);
         anonimaCheckbox.addEventListener('change', updateFormState);
 
-        const buscarBtn = document.getElementById('buscar-doador-btn');
-        const doadorEncontradoDiv = document.getElementById('doador-encontrado');
-        const doadorNaoEncontradoDiv = document.getElementById('doador-nao-encontrado');
-        const doadorNomeSpan = document.getElementById('doador-nome');
-        const cpfInput = document.getElementById('cpf_cnpj_busca');
+        function preencherDoador(doador) {
+            if (!doador) {
+                return;
+            }
+            if (doador.cpf_cnpj) {
+                $('#cpf_cnpj_busca').val(doador.cpf_cnpj).trigger('input');
+            }
+            doadorNomeSpan.textContent = doador.nome;
+            doadorIdInput.value = doador.id;
+            doadorEncontradoDiv.style.display = 'block';
+            doadorNaoEncontradoDiv.style.display = 'none';
+            updateFormState();
+        }
 
         function limparDoador() {
             doadorEncontradoDiv.style.display = 'none';
@@ -287,11 +423,170 @@
             updateFormState();
         }
 
-        document.getElementById('limpar-doador-btn').addEventListener('click', limparDoador);
+        limparDoadorBtn.addEventListener('click', limparDoador);
+
+        function resetNovoDoadorForm() {
+            novoDoadorForm.reset();
+            $(modalCpfInput).val('').trigger('input');
+            $(modalTelefoneInput).val('').trigger('input');
+            $(modalCepInput).val('').trigger('input');
+            novoDoadorErrors.classList.add('d-none');
+            novoDoadorErrors.innerHTML = '';
+            modalCepError.style.display = 'none';
+            modalCepError.textContent = '';
+            modalCepInput.classList.remove('is-invalid');
+        }
+
+        function preencherEndereco(dados) {
+            if (!dados) {
+                return;
+            }
+            if (dados.logradouro) {
+                modalLogradouroInput.value = dados.logradouro;
+            }
+            if (dados.localidade) {
+                modalCidadeInput.value = dados.localidade;
+            }
+            if (dados.uf) {
+                modalEstadoInput.value = dados.uf;
+            }
+            modalNumeroInput.focus();
+        }
+
+        function buscarCepModal() {
+            const cep = modalCepInput.value.replace(/\D/g, '');
+            modalCepError.style.display = 'none';
+            modalCepError.textContent = '';
+
+            if (cep.length !== 8) {
+                modalCepError.textContent = 'CEP inválido. Deve conter 8 dígitos.';
+                modalCepError.style.display = 'block';
+                modalCepInput.classList.add('is-invalid');
+                return;
+            }
+
+            modalCepInput.classList.remove('is-invalid');
+            modalBuscarCepBtn.disabled = true;
+            modalBuscarCepBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Buscando...';
+
+            fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Erro ao buscar CEP. Verifique a conexão.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.erro) {
+                        throw new Error('CEP não encontrado.');
+                    }
+                    modalCepInput.classList.remove('is-invalid');
+                    preencherEndereco(data);
+                })
+                .catch(error => {
+                    console.error('Erro na busca de CEP:', error);
+                    modalCepError.textContent = error.message || 'Não foi possível buscar o CEP.';
+                    modalCepError.style.display = 'block';
+                    modalCepInput.classList.add('is-invalid');
+                })
+                .finally(() => {
+                    modalBuscarCepBtn.disabled = false;
+                    modalBuscarCepBtn.innerHTML = 'Buscar CEP';
+                });
+        }
+
+        if (modalBuscarCepBtn) {
+            modalBuscarCepBtn.addEventListener('click', buscarCepModal);
+        }
+
+        if (modalCepInput) {
+            modalCepInput.addEventListener('input', function() {
+                modalCepInput.classList.remove('is-invalid');
+                modalCepError.style.display = 'none';
+                modalCepError.textContent = '';
+            });
+        }
+
+        if (abrirModalBtn) {
+            abrirModalBtn.addEventListener('click', function() {
+                resetNovoDoadorForm();
+                $(modalCpfInput).val(cpfInput.value).trigger('input');
+                novoDoadorModal.show();
+            });
+        }
+
+        if (bootstrapModal) {
+            novoDoadorModalEl.addEventListener('shown.bs.modal', function() {
+                modalNomeInput.focus();
+            });
+
+            novoDoadorModalEl.addEventListener('hidden.bs.modal', function() {
+                resetNovoDoadorForm();
+            });
+        }
+
+        novoDoadorForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            novoDoadorErrors.classList.add('d-none');
+            novoDoadorErrors.innerHTML = '';
+
+            const formData = new FormData(novoDoadorForm);
+
+            novoDoadorSubmitBtn.disabled = true;
+            novoDoadorSubmitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Cadastrando...';
+
+            fetch(`{{ route('doadores.store') }}`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        if (response.status === 422) {
+                            return response.json().then(data => {
+                                throw {
+                                    type: 'validation',
+                                    errors: data.errors || {}
+                                };
+                            });
+                        }
+                        throw new Error('Não foi possível cadastrar o doador.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const doador = data.doador || data;
+                    if (doador && doador.cpf_cnpj) {
+                        $('#cpf_cnpj_busca').val(doador.cpf_cnpj).trigger('input');
+                    }
+                    preencherDoador(doador);
+                    novoDoadorModal.hide();
+                })
+                .catch(error => {
+                    if (error.type === 'validation') {
+                        const messages = Object.values(error.errors).flat();
+                        if (messages.length) {
+                            novoDoadorErrors.innerHTML = messages.map(message => `<div>${message}</div>`).join('');
+                            novoDoadorErrors.classList.remove('d-none');
+                        }
+                    } else {
+                        novoDoadorErrors.textContent = error.message || 'Não foi possível cadastrar o doador.';
+                        novoDoadorErrors.classList.remove('d-none');
+                    }
+                })
+                .finally(() => {
+                    novoDoadorSubmitBtn.disabled = false;
+                    novoDoadorSubmitBtn.innerHTML = 'Cadastrar';
+                });
+        });
 
         buscarBtn.addEventListener('click', function() {
             const cpfCnpj = cpfInput.value;
             doadorNaoEncontradoDiv.style.display = 'none';
+            doadorEncontradoDiv.style.display = 'none';
             if (!cpfCnpj) {
                 alert('Por favor, digite um CPF ou CNPJ para buscar.');
                 return;
@@ -301,7 +596,11 @@
             fetch(`{{ route('doadores.buscar') }}?cpf_cnpj=${encodeURIComponent(cpfCnpj)}`)
                 .then(response => {
                     if (response.status === 404) {
-                        throw new Error('Doador não encontrado.');
+                        return response.json().then(() => {
+                            throw {
+                                type: 'not_found'
+                            };
+                        });
                     }
                     if (!response.ok) {
                         throw new Error('Falha na requisição ao servidor.');
@@ -309,15 +608,17 @@
                     return response.json();
                 })
                 .then(data => {
-                    doadorNomeSpan.textContent = data.nome;
-                    doadorIdInput.value = data.id;
-                    doadorEncontradoDiv.style.display = 'block';
-                    updateFormState();
+                    preencherDoador(data);
                 })
                 .catch(error => {
                     console.error('Erro na busca:', error);
-                    doadorNaoEncontradoDiv.style.display = 'block';
                     doadorIdInput.value = '';
+                    if (error.type === 'not_found') {
+                        doadorNaoEncontradoMensagem.textContent = 'Doador não encontrado. Cadastre um novo doador para continuar.';
+                    } else {
+                        doadorNaoEncontradoMensagem.textContent = 'Não foi possível buscar o doador. Tente novamente em instantes.';
+                    }
+                    doadorNaoEncontradoDiv.style.display = 'block';
                     updateFormState();
                 })
                 .finally(() => {
