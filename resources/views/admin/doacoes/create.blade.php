@@ -273,6 +273,7 @@
                 })
                 ->values()
         );
+        const itemSearchInput = document.getElementById('item_search');
         const itemSearchResults = document.getElementById('item_search_results');
         const selectedItemIdInput = document.getElementById('selected_item_id');
         const selectedItemInfo = document.getElementById('selected-item-info');
