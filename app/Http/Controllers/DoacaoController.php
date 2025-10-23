@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Estoque;
 use App\Models\Doacao;
 use App\Models\Doador;
 use App\Models\Item;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 use Spatie\Activitylog\Models\Activity;
 
 class DoacaoController extends Controller
@@ -70,14 +72,17 @@ class DoacaoController extends Controller
         $doacao->data_doacao = $validatedData['data_doacao'];
         $doacao->tipo = $validatedData['tipo'];
         $doacao->descricao = $validatedData['descricao'];
-        $doacao->paroquia_id = Auth::user()->paroquia_id;
+        $paroquiaId = Auth::user()->paroquia_id;
+        $doacao->paroquia_id = $paroquiaId;
         $doacao->doador_id = $doadorId;
 
         if ($request->tipo == 'dinheiro') {
             $request->validate(['quantidade' => 'required|numeric|min:0.01']);
-            $doacao->quantidade = $request->quantidade;
-            $doacao->unidade = 'R$';
-            $doacao->save();
+            DB::transaction(function () use ($doacao, $request) {
+                $doacao->quantidade = (float) $request->quantidade;
+                $doacao->unidade = 'R$';
+                $doacao->save();
+            });
         } elseif ($request->tipo == 'item') {
             $request->validate([
                 'items' => 'required|array|min:1',
@@ -107,16 +112,32 @@ class DoacaoController extends Controller
 
                 if ($itemId) {
                     $itemsToAttach[$itemId] = [
-                        'quantidade' => $itemData['quantidade'],
+                        'quantidade' => round((float) $itemData['quantidade'], 3),
                         'unidade' => $itemData['unidade']
                     ];
                 }
             }
 
             if (!empty($itemsToAttach)) {
-                $doacao->items()->attach($itemsToAttach);
+                DB::transaction(function () use ($doacao, $itemsToAttach, $paroquiaId) {
+                    $doacao->quantidade = null;
+                    $doacao->unidade = null;
+                    $doacao->save();
+
+                    $doacao->items()->attach($itemsToAttach);
+
+                    foreach ($itemsToAttach as $itemId => $itemData) {
+                        $estoque = Estoque::firstOrNew([
+                            'paroquia_id' => $paroquiaId,
+                            'item_id' => $itemId,
+                            'unidade' => $itemData['unidade'],
+                        ]);
+
+                        $estoque->quantidade = round(($estoque->quantidade ?? 0) + $itemData['quantidade'], 3);
+                        $estoque->save();
+                    }
+                });
             } else {
-                $doacao->delete();
                 return back()->withErrors(['items' => 'Não foi possível processar os itens. Verifique os dados.'])->withInput();
             }
         } else {

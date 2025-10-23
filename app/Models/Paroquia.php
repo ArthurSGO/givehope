@@ -36,4 +36,9 @@ class Paroquia extends Model
     {
         return $this->hasMany(Doacao::class);
     }
+
+    public function estoques()
+    {
+        return $this->hasMany(Estoque::class);
+    }
 }

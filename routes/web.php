@@ -9,6 +9,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DoacaoController;
 use App\Http\Controllers\DoadorController;
 use App\Http\Controllers\PainelController;
+use App\Http\Controllers\EstoqueController;
 use App\Http\Controllers\ParoquiaController;
 use App\Http\Controllers\BeneficiarioController;
 use App\Http\Controllers\PublicDonationLookupController;
@@ -27,6 +28,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('doadores', DoadorController::class);
     Route::resource('beneficiarios', BeneficiarioController::class);
     Route::get('/painel', [PainelController::class, 'index'])->name('painel.dashboard');
+    Route::get('estoque', [EstoqueController::class, 'index'])->name('estoque.index');
 });
 
 Route::get('/', function () {

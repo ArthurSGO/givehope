@@ -17,4 +17,9 @@ class Item extends Model
             ->withPivot('quantidade', 'unidade')
             ->withTimestamps();
     }
+
+    public function estoques()
+    {
+        return $this->hasMany(Estoque::class);
+    }
 }

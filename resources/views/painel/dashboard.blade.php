@@ -72,6 +72,24 @@
         </div>
 
         <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2" data-icon="📊">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Consultar</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">Estoque</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-boxes-stacked fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                    <a href="{{ route('estoque.index') }}" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
             <div class="card border-left-warning shadow h-100 py-2" data-icon="🧑‍🤝‍🧑">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
@@ -168,6 +186,10 @@
 
         .card .border-left-warning {
             border-left: 0.25rem solid #f6c23e !important;
+        }
+
+        .card .border-left-info {
+            border-left: 0.25rem solid #36b9cc !important;
         }
     </style>
     @endpush
