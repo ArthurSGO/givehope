@@ -2,16 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Doacao;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Spatie\Activitylog\Models\Activity;
 
 class LogController extends Controller
 {
     public function index()
     {
-        $logs = Activity::with(['subject' => function ($query) {
-            $query->with(['doador:id,nome', 'items:id,nome']);
-        }, 'causer'])
+        $logs = Activity::with([
+            'causer:id,name',
+            'subject' => function (MorphTo $morphTo) {
+                $morphTo->morphWith([
+                    Doacao::class => ['doador:id,nome', 'items:id,nome'],
+                ]);
+            },
+        ])
             ->where('log_name', 'Doações')
             ->latest()
             ->paginate(15);
@@ -31,7 +38,18 @@ class LogController extends Controller
 
     public function show($id)
     {
-        //
+        $log = Activity::with([
+            'causer:id,name',
+            'subject' => function (MorphTo $morphTo) {
+                $morphTo->morphWith([
+                    Doacao::class => ['doador:id,nome', 'items:id,nome'],
+                ]);
+            },
+        ])
+            ->where('log_name', 'Doações')
+            ->findOrFail($id);
+
+        return view('admin.logs.show', compact('log'));
     }
 
     public function edit($id)

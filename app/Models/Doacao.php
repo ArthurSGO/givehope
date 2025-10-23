@@ -36,16 +36,15 @@ class Doacao extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['tipo', 'quantidade', 'unidade', 'descricao'])
+            ->logOnly(['tipo', 'quantidade', 'unidade', 'descricao', 'data_doacao'])
             ->logOnlyDirty()
             ->setDescriptionForEvent(function (string $eventName) {
-                if ($eventName === 'updated') {
-                    return 'Uma doação foi atualizada';
-                }
-                if ($eventName === 'deleted') {
-                    return 'Uma doação foi excluída';
-                }
-                return "Uma doação foi {$eventName}";
+                return match ($eventName) {
+                    'created' => 'Uma doação foi registrada',
+                    'updated' => 'Uma doação foi atualizada',
+                    'deleted' => 'Uma doação foi excluída',
+                    default => "Uma doação foi {$eventName}",
+                };
             })
             ->useLogName('Doações')
             ->dontSubmitEmptyLogs();

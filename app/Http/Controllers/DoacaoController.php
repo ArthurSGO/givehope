@@ -7,6 +7,7 @@ use App\Models\Doador;
 use App\Models\Item;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Activitylog\Models\Activity;
 
 class DoacaoController extends Controller
 {
@@ -133,7 +134,14 @@ class DoacaoController extends Controller
             ->where('paroquia_id', $user->paroquia_id)
             ->findOrFail($id);
 
-        return view('admin.doacoes.show', compact('doacao'));
+        $logs = Activity::with('causer:id,name')
+            ->where('log_name', 'Doações')
+            ->where('subject_type', Doacao::class)
+            ->where('subject_id', $doacao->id)
+            ->latest()
+            ->get();
+
+        return view('admin.doacoes.show', compact('doacao', 'logs'));
     }
 
     public function edit($id)
