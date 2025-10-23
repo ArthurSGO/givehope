@@ -138,6 +138,37 @@ class DoacaoController extends Controller
 
         $doacao = $doacaoQuery->findOrFail($id);
 
+        $resumoItens = [];
+
+        if ($doacao->tipo === 'item') {
+            $formatarQuantidade = function (float $valor, string $unidade): string {
+                $casasDecimais = $unidade === 'Kg' ? 3 : 0;
+                $formatado = number_format($valor, $casasDecimais, ',', '.');
+
+                if ($casasDecimais > 0) {
+                    $formatado = rtrim(rtrim($formatado, '0'), ',');
+                }
+
+                return $formatado;
+            };
+
+            $doacao->items->each(function ($item) use ($formatarQuantidade) {
+                $item->formatted_quantidade = $formatarQuantidade(
+                    (float) $item->pivot->quantidade,
+                    $item->pivot->unidade
+                );
+            });
+
+            $resumoItens = $doacao->items
+                ->groupBy(fn($item) => $item->pivot->unidade)
+                ->mapWithKeys(function ($grupo, $unidade) use ($formatarQuantidade) {
+                    $total = $grupo->sum(fn($item) => (float) $item->pivot->quantidade);
+
+                    return [$unidade => $formatarQuantidade($total, $unidade)];
+                })
+                ->toArray();
+        }
+
         $logs = Activity::with('causer:id,name')
             ->where('log_name', 'Doações')
             ->where('subject_type', Doacao::class)

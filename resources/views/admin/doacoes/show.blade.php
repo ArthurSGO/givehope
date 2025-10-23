@@ -88,10 +88,7 @@
                                 @foreach($doacao->items as $item)
                                 <tr>
                                     <td>{{ $item->nome }}</td>
-                                    <td class="text-end">
-                                        {{ number_format($item->pivot->quantidade, 
-                                        $item->pivot->unidade == 'Kg' ? 3 : 0, ',', '.') }}
-                                    </td>
+                                    <td class="text-end">{{ $item->formatted_quantidade ?? $item->pivot->quantidade }}</td>
                                     <td>{{ $item->pivot->unidade }}</td>
                                 </tr>
                                 @endforeach
@@ -101,10 +98,10 @@
                 </div>
                 @if(!empty($resumoItens))
                 <div class="card-footer bg-light text-muted small d-flex justify-content-end">
-                    @foreach($resumoItens as $un => $soma)
+                    @foreach($resumoItens as $un => $totalFormatado)
                     <span class="ms-4">
                         Total {{ $un }}: <strong>
-                            {{ number_format($soma, $un == 'Kg' ? 3 : 0, ',', '.') }}
+                            {{ $totalFormatado }}
                         </strong>
                     </span>
                     @endforeach
