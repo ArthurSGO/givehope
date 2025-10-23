@@ -29,12 +29,7 @@ class DoadorController extends Controller
         return view('admin.doadores.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
+    
     public function store(Request $request)
     {
         if ($request->has('telefone')) {

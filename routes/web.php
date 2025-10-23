@@ -11,6 +11,7 @@ use App\Http\Controllers\DoadorController;
 use App\Http\Controllers\PainelController;
 use App\Http\Controllers\ParoquiaController;
 use App\Http\Controllers\BeneficiarioController;
+use App\Http\Controllers\PublicDonationLookupController;
 
 Route::middleware(['auth', 'is_admin'])->group(function () {
     Route::get('admin', [AdminController::class, 'index'])->name('admin.dashboard');
@@ -43,8 +44,6 @@ Route::get('soon', function () {
 Route::get('about', function () {
     return view('about');
 })->name('about');
-Route::get('seek', function () {
-    return view('seek');
-})->name('seek');
+Route::get('seek', PublicDonationLookupController::class)->name('seek');
 
 Auth::routes(['register' => false]);

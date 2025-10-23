@@ -21,4 +21,9 @@ class Doador extends Model
         'cidade',
         'estado',
     ];
+
+    public function doacoes()
+    {
+        return $this->hasMany(Doacao::class);
+    }
 }
