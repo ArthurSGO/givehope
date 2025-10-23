@@ -90,21 +90,62 @@ class DoacaoController extends Controller
                 'items.*.unidade' => 'required|in:Unidade,Kg',
                 'items.*.item_id' => 'required',
                 'items.*.new_item_name' => 'nullable|required_if:items.*.item_id,new|string|max:255',
+                'items.*.new_item_category' => 'sometimes|nullable|required_if:items.*.item_id,new|in:alimento,outro',
             ], [
                 'items.required' => 'Adicione pelo menos um item à doação.',
                 'items.min' => 'Adicione pelo menos um item à doação.',
                 'items.*.new_item_name.required_if' => 'O nome do novo item é obrigatório.',
+                'items.*.new_item_category.required_if' => 'A categoria do novo item é obrigatória.',
+                'items.*.new_item_category.in' => 'Selecione uma categoria válida para o item.',
             ]);
 
             $doacao->quantidade = null;
             $doacao->unidade = null;
             $doacao->save();
 
+            $itemsCollection = collect($request->input('items', []));
+            $existingItemIds = $itemsCollection
+                ->pluck('item_id')
+                ->filter(fn($id) => is_numeric($id))
+                ->map(fn($id) => (int) $id)
+                ->unique()
+                ->values();
+
+            $existingItems = Item::whereIn('id', $existingItemIds)->get()->keyBy('id');
+
+            $unitErrors = [];
+            foreach ($itemsCollection as $index => $itemData) {
+                $unidade = $itemData['unidade'] ?? null;
+                if (($itemData['item_id'] ?? null) === 'new') {
+                    $category = $itemData['new_item_category'] ?? null;
+                    if ($category === 'alimento' && $unidade !== 'Kg') {
+                        $unitErrors["items.$index.unidade"] = 'Itens da categoria "Alimento" devem ser cadastrados em Kg.';
+                    }
+                } elseif (is_numeric($itemData['item_id'])) {
+                    $existingItem = $existingItems->get((int) $itemData['item_id']);
+                    if ($existingItem && $existingItem->categoria === 'alimento' && $unidade !== 'Kg') {
+                        $unitErrors["items.$index.unidade"] = 'Itens da categoria "Alimento" devem ser cadastrados em Kg.';
+                    }
+                }
+            }
+
+            if (!empty($unitErrors)) {
+                return back()->withErrors($unitErrors)->withInput();
+            }
+
             $itemsToAttach = [];
             foreach ($request->items as $itemData) {
                 $itemId = null;
                 if ($itemData['item_id'] == 'new' && !empty($itemData['new_item_name'])) {
-                    $newItem = Item::firstOrCreate(['nome' => trim($itemData['new_item_name'])]);
+                    $itemName = trim($itemData['new_item_name']);
+                    $newItemCategory = $itemData['new_item_category'] ?? null;
+                    $newItem = Item::firstOrCreate(
+                        ['nome' => $itemName],
+                        $newItemCategory ? ['categoria' => $newItemCategory] : []
+                    );
+                    if (!$newItem->wasRecentlyCreated && $newItemCategory && empty($newItem->categoria)) {
+                        $newItem->update(['categoria' => $newItemCategory]);
+                    }
                     $itemId = $newItem->id;
                 } elseif (is_numeric($itemData['item_id'])) {
                     $itemId = $itemData['item_id'];

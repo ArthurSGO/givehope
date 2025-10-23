@@ -80,21 +80,42 @@
                         <div id="item-donation-section" style="display: none;">
                             <div class="card bg-light p-3">
                                 <h6 class="card-title">Adicionar Itens à Doação</h6>
-                                <div class="row g-3 align-items-end">
-                                    <div class="col-md-5">
-                                        <label for="item_id" class="form-label">Item</label>
-                                        <select id="item_id" class="form-select">
-                                            <option value="">Selecione um item...</option>
-                                            <option value="new">--- Cadastrar Novo Item ---</option>
-                                            @foreach ($items as $item)
-                                            <option value="{{ $item->id }}">{{ $item->nome }}</option>
-                                            @endforeach
-                                        </select>
+                                <div class="row g-3 align-items-end position-relative">
+                                    <div class="col-md-6 position-relative">
+                                        <label for="item_search" class="form-label">Buscar Item</label>
+                                        <input type="text" id="item_search" class="form-control" placeholder="Digite para buscar..." autocomplete="off">
+                                        <input type="hidden" id="selected_item_id">
+                                        <div id="item_search_results" class="list-group shadow position-absolute w-100" style="z-index: 1050; display: none; top: 100%; left: 0; max-height: 220px; overflow-y: auto;"></div>
+                                        <div id="selected-item-info" class="alert alert-info mt-2 py-2 px-3 d-none">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span id="selected-item-name" class="fw-semibold"></span>
+                                                <button type="button" class="btn btn-sm btn-link text-danger p-0" id="clear-selected-item">Remover</button>
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    <div class="col-md-5" id="new-item-wrapper" style="display: none;">
-                                        <label for="new_item_name" class="form-label">Nome do Novo Item</label>
-                                        <input type="text" id="new_item_name" class="form-control">
+                                    <div class="col-md-3 d-flex align-items-end">
+                                        <button type="button" class="btn btn-outline-secondary w-100" id="toggle-new-item-btn">Cadastrar novo item</button>
+                                    </div>
+
+                                    <div class="col-md-12" id="new-item-section" style="display: none;">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label for="new_item_name" class="form-label">Nome do Novo Item</label>
+                                                <input type="text" id="new_item_name" class="form-control" placeholder="Digite o nome do item">
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="new_item_category" class="form-label">Categoria</label>
+                                                <select id="new_item_category" class="form-select">
+                                                    <option value="">Selecione...</option>
+                                                    <option value="alimento">Alimento</option>
+                                                    <option value="outro">Outro</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-2 d-flex align-items-end">
+                                                <button type="button" class="btn btn-link text-decoration-none text-danger px-0" id="cancel-new-item-btn">Cancelar</button>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div class="col-md-3">
@@ -241,8 +262,29 @@
         const doadorIdInput = document.getElementById('doador_id');
         const submitButton = document.getElementById('submit-button');
         const itemOption = tipoSelect.querySelector('option[value="item"]');
-        const itemSelect = document.getElementById('item_id');
-        const newItemWrapper = document.getElementById('new-item-wrapper');
+        const itemsData = @json(
+            $items
+                ->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'nome' => $item->nome,
+                        'categoria' => $item->categoria,
+                    ];
+                })
+                ->values()
+        );
+        const itemSearchResults = document.getElementById('item_search_results');
+        const selectedItemIdInput = document.getElementById('selected_item_id');
+        const selectedItemInfo = document.getElementById('selected-item-info');
+        const selectedItemName = document.getElementById('selected-item-name');
+        const clearSelectedItemBtn = document.getElementById('clear-selected-item');
+        const toggleNewItemBtn = document.getElementById('toggle-new-item-btn');
+        const newItemSection = document.getElementById('new-item-section');
+        const newItemNameInput = document.getElementById('new_item_name');
+        const newItemCategorySelect = document.getElementById('new_item_category');
+        const cancelNewItemBtn = document.getElementById('cancel-new-item-btn');
+        const unidadeSelect = document.getElementById('item_unidade');
+        selectedItemIdInput.dataset.category = selectedItemIdInput.dataset.category || '';
         const quantidadeDinheiroInput = document.getElementById('quantidade_dinheiro');
         const buscarBtn = document.getElementById('buscar-doador-btn');
         const doadorEncontradoDiv = document.getElementById('doador-encontrado');
@@ -319,42 +361,225 @@
             submitButton.disabled = !((isAnonima && isDinheiro) || (!isAnonima && doadorSelecionado));
         }
 
-        itemSelect.addEventListener('change', function() {
-            newItemWrapper.style.display = this.value === 'new' ? 'block' : 'none';
-        });
-
         const addItemBtn = document.getElementById('add-item-btn');
         const itemList = document.getElementById('item-list');
         const emptyItemList = document.getElementById('empty-item-list');
         let itemCounter = 0;
 
+        let creatingNewItem = false;
+
+        function sanitizeForAttribute(value) {
+            return String(value || '')
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function setUnitOptionsForCategory(category) {
+            if (!unidadeSelect) {
+                return;
+            }
+            const options = Array.from(unidadeSelect.options);
+            if (category === 'alimento') {
+                options.forEach(option => {
+                    option.disabled = option.value !== 'Kg';
+                });
+                unidadeSelect.value = 'Kg';
+            } else {
+                options.forEach(option => option.disabled = false);
+                if (!['Unidade', 'Kg'].includes(unidadeSelect.value)) {
+                    unidadeSelect.value = 'Unidade';
+                }
+            }
+        }
+
+        function hideSearchResults() {
+            itemSearchResults.style.display = 'none';
+            itemSearchResults.innerHTML = '';
+        }
+
+        function renderSearchResults(query) {
+            const normalizedQuery = query.trim().toLowerCase();
+            if (!normalizedQuery) {
+                hideSearchResults();
+                return;
+            }
+
+            const results = itemsData.filter(item => item.nome.toLowerCase().includes(normalizedQuery)).slice(0, 8);
+            itemSearchResults.innerHTML = '';
+
+            if (results.length === 0) {
+                const emptyItem = document.createElement('div');
+                emptyItem.className = 'list-group-item disabled';
+                emptyItem.textContent = 'Nenhum item encontrado.';
+                itemSearchResults.appendChild(emptyItem);
+            } else {
+                results.forEach(item => {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'list-group-item list-group-item-action';
+                    button.textContent = item.nome;
+                    button.addEventListener('click', function() {
+                        selectExistingItem(item);
+                    });
+                    itemSearchResults.appendChild(button);
+                });
+            }
+
+            itemSearchResults.style.display = 'block';
+        }
+
+        function clearSelectedItem() {
+            selectedItemIdInput.value = '';
+            selectedItemIdInput.dataset.category = '';
+            selectedItemInfo.classList.add('d-none');
+            selectedItemName.textContent = '';
+            if (!creatingNewItem) {
+                itemSearchInput.value = '';
+            }
+            setUnitOptionsForCategory(null);
+        }
+
+        function hideNewItemSection() {
+            creatingNewItem = false;
+            newItemSection.style.display = 'none';
+            toggleNewItemBtn.textContent = 'Cadastrar novo item';
+            itemSearchInput.disabled = false;
+            newItemNameInput.value = '';
+            newItemCategorySelect.value = '';
+            if (selectedItemIdInput.value === 'new') {
+                selectedItemIdInput.value = '';
+            }
+            setUnitOptionsForCategory(selectedItemIdInput.dataset.category || null);
+            hideSearchResults();
+        }
+
+        function selectExistingItem(item) {
+            if (!item) {
+                return;
+            }
+            hideNewItemSection();
+            clearSelectedItem();
+            selectedItemIdInput.value = item.id;
+            selectedItemIdInput.dataset.category = item.categoria || '';
+            selectedItemInfo.classList.remove('d-none');
+            selectedItemName.textContent = item.nome;
+            itemSearchInput.value = item.nome;
+            setUnitOptionsForCategory(item.categoria || null);
+            hideSearchResults();
+        }
+
+        function showNewItemSection() {
+            clearSelectedItem();
+            hideSearchResults();
+            creatingNewItem = true;
+            newItemSection.style.display = 'block';
+            toggleNewItemBtn.textContent = 'Usar item existente';
+            itemSearchInput.disabled = true;
+            selectedItemIdInput.value = 'new';
+            setUnitOptionsForCategory(newItemCategorySelect.value || null);
+            newItemNameInput.focus();
+        }
+
+        if (itemSearchInput) {
+            itemSearchInput.addEventListener('input', function(event) {
+                if (creatingNewItem) {
+                    return;
+                }
+                if (selectedItemIdInput.value) {
+                    clearSelectedItem();
+                }
+                renderSearchResults(event.target.value);
+            });
+
+            itemSearchInput.addEventListener('focus', function(event) {
+                if (!creatingNewItem && event.target.value.trim()) {
+                    renderSearchResults(event.target.value);
+                }
+            });
+        }
+
+        document.addEventListener('click', function(event) {
+            if (!itemSearchResults.contains(event.target) && event.target !== itemSearchInput) {
+                hideSearchResults();
+            }
+        });
+
+        if (clearSelectedItemBtn) {
+            clearSelectedItemBtn.addEventListener('click', function() {
+                clearSelectedItem();
+                hideSearchResults();
+                itemSearchInput.focus();
+            });
+        }
+
+        if (toggleNewItemBtn) {
+            toggleNewItemBtn.addEventListener('click', function() {
+                if (creatingNewItem) {
+                    hideNewItemSection();
+                } else {
+                    showNewItemSection();
+                }
+            });
+        }
+
+        if (cancelNewItemBtn) {
+            cancelNewItemBtn.addEventListener('click', function() {
+                hideNewItemSection();
+                clearSelectedItem();
+            });
+        }
+
+        if (newItemCategorySelect) {
+            newItemCategorySelect.addEventListener('change', function(event) {
+                if (creatingNewItem) {
+                    setUnitOptionsForCategory(event.target.value || null);
+                }
+            });
+        }
+
         addItemBtn.addEventListener('click', function() {
             const quantidadeInput = document.getElementById('item_quantidade');
-            const unidadeSelect = document.getElementById('item_unidade');
-            let itemId = itemSelect.value;
+            const quantidade = quantidadeInput.value;
+            const unidade = unidadeSelect.value;
+            const isCreatingNewItem = creatingNewItem;
+            let itemId = isCreatingNewItem ? 'new' : selectedItemIdInput.value;
             let itemName = '';
             let newItemName = '';
+            let newItemCategory = '';
+            let itemCategory = '';
 
-            if (itemId === 'new') {
-                const newItemInput = document.getElementById('new_item_name');
-                itemName = newItemInput.value.trim();
-                newItemName = itemName;
-                if (!itemName) {
+            if (isCreatingNewItem) {
+                newItemName = newItemNameInput.value.trim();
+                newItemCategory = newItemCategorySelect.value;
+                if (!newItemName) {
                     alert('Por favor, digite o nome do novo item.');
                     return;
                 }
+                if (!newItemCategory) {
+                    alert('Selecione a categoria do novo item.');
+                    return;
+                }
+                itemName = newItemName;
+                itemCategory = newItemCategory;
             } else if (itemId) {
-                itemName = itemSelect.options[itemSelect.selectedIndex].text;
+                const selectedItem = itemsData.find(item => String(item.id) === String(itemId));
+                itemName = selectedItem ? selectedItem.nome : itemSearchInput.value.trim();
+                itemCategory = selectedItem ? (selectedItem.categoria || '') : '';
             } else {
                 alert('Por favor, selecione um item ou cadastre um novo.');
                 return;
             }
 
-            const quantidade = quantidadeInput.value;
-            const unidade = unidadeSelect.value;
-
             if (!quantidade || parseFloat(quantidade) <= 0) {
                 alert('Por favor, informe uma quantidade válida.');
+                return;
+            }
+
+            if ((itemCategory === 'alimento' || newItemCategory === 'alimento') && unidade !== 'Kg') {
+                alert('Itens da categoria "Alimento" devem ser cadastrados em Kg.');
                 return;
             }
 
@@ -364,37 +589,46 @@
 
             const listItem = document.createElement('li');
             listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
-            listItem.innerHTML = `
-            <span>${itemName} - <strong>${quantidade} ${unidade}</strong></span>
-            <button type="button" class="btn-close" aria-label="Remove"></button>
-        `;
 
-            let hiddenInputs;
-            if (itemId === 'new') {
-                hiddenInputs = `<input type="hidden" name="items[${itemCounter}][item_id]" value="new">`;
-                hiddenInputs += `<input type="hidden" name="items[${itemCounter}][new_item_name]" value="${newItemName}">`;
-            } else {
-                hiddenInputs = `<input type="hidden" name="items[${itemCounter}][item_id]" value="${itemId}">`;
-                hiddenInputs += `<input type="hidden" name="items[${itemCounter}][new_item_name]" value="">`;
-            }
-            hiddenInputs += `
-            <input type="hidden" name="items[${itemCounter}][quantidade]" value="${quantidade}">
-            <input type="hidden" name="items[${itemCounter}][unidade]" value="${unidade}">
-        `;
-            listItem.insertAdjacentHTML('beforeend', hiddenInputs);
+            const infoSpan = document.createElement('span');
+            infoSpan.appendChild(document.createTextNode(`${itemName} - `));
+            const quantityStrong = document.createElement('strong');
+            quantityStrong.textContent = `${quantidade} ${unidade}`;
+            infoSpan.appendChild(quantityStrong);
+            listItem.appendChild(infoSpan);
 
-            listItem.querySelector('.btn-close').addEventListener('click', function() {
+            const removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.className = 'btn-close';
+            removeButton.setAttribute('aria-label', 'Remove');
+            removeButton.addEventListener('click', function() {
                 listItem.remove();
                 if (itemList.children.length === 1) {
                     emptyItemList.style.display = 'block';
                 }
             });
 
+            listItem.appendChild(removeButton);
+
+            let hiddenInputs = '';
+            hiddenInputs += `<input type="hidden" name="items[${itemCounter}][item_id]" value="${sanitizeForAttribute(itemId)}">`;
+            hiddenInputs += `<input type="hidden" name="items[${itemCounter}][new_item_name]" value="${sanitizeForAttribute(isCreatingNewItem ? newItemName : '')}">`;
+            if (isCreatingNewItem) {
+                hiddenInputs += `<input type="hidden" name="items[${itemCounter}][new_item_category]" value="${sanitizeForAttribute(newItemCategory)}">`;
+            }
+            hiddenInputs += `<input type="hidden" name="items[${itemCounter}][quantidade]" value="${sanitizeForAttribute(quantidade)}">`;
+            hiddenInputs += `<input type="hidden" name="items[${itemCounter}][unidade]" value="${sanitizeForAttribute(unidade)}">`;
+            listItem.insertAdjacentHTML('beforeend', hiddenInputs);
+
             itemList.appendChild(listItem);
-            itemSelect.value = '';
-            newItemWrapper.style.display = 'none';
-            document.getElementById('new_item_name').value = '';
+            if (isCreatingNewItem) {
+                hideNewItemSection();
+            } else {
+                clearSelectedItem();
+            }
             quantidadeInput.value = '';
+            unidadeSelect.value = 'Unidade';
+            setUnitOptionsForCategory(selectedItemIdInput.dataset.category || null);
             itemCounter++;
         });
 
@@ -626,6 +860,8 @@
                     this.innerHTML = 'Buscar';
                 });
         });
+
+        setUnitOptionsForCategory(selectedItemIdInput.dataset.category || null);
 
         toggleDonationSections();
         updateFormState();
