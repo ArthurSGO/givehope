@@ -8,7 +8,7 @@
             <div class="card shadow-sm mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="fa-solid fa-magnifying-glass me-2"></i>Detalhes do Log #{{ $log->id }}</h5>
-                    <a href="{{ url()->previous() ?: route('logs.index') }}" class="btn btn-outline-secondary btn-sm">
+                    <a href="{{ route('logs.index') }}" class="btn btn-outline-secondary btn-sm">
                         <i class="fa-solid fa-arrow-left"></i> Voltar
                     </a>
                 </div>

@@ -130,9 +130,13 @@ class DoacaoController extends Controller
     {
         $user = Auth::user();
 
-        $doacao = Doacao::with(['doador', 'items'])
-            ->where('paroquia_id', $user->paroquia_id)
-            ->findOrFail($id);
+        $doacaoQuery = Doacao::with(['doador', 'items']);
+
+        if (!$user->is_admin) {
+            $doacaoQuery->where('paroquia_id', $user->paroquia_id);
+        }
+
+        $doacao = $doacaoQuery->findOrFail($id);
 
         $logs = Activity::with('causer:id,name')
             ->where('log_name', 'Doações')
