@@ -225,6 +225,7 @@
 @endsection
 
 @push('scripts')
+<div id="preloaded-items-data" data-items='@json($itemsData)' class="d-none"></div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 
@@ -262,17 +263,7 @@
         const doadorIdInput = document.getElementById('doador_id');
         const submitButton = document.getElementById('submit-button');
         const itemOption = tipoSelect.querySelector('option[value="item"]');
-        const itemsData = @json(
-            $items
-                ->map(function ($item) {
-                    return [
-                        'id' => $item->id,
-                        'nome' => $item->nome,
-                        'categoria' => $item->categoria,
-                    ];
-                })
-                ->values()
-        );
+        const itemsData = @json($itemsData);
         const itemSearchInput = document.getElementById('item_search');
         const itemSearchResults = document.getElementById('item_search_results');
         const selectedItemIdInput = document.getElementById('selected_item_id');

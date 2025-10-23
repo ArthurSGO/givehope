@@ -23,6 +23,10 @@
                     $valorFormatado = rtrim(rtrim($valorFormatado, '0'), ',');
                     }
 
+                    if ($unidade === 'Unidade') {
+                    $unidade = (float) $quantidade === 1.0 ? 'Unidade' : 'Unidades';
+                    }
+
                     return $valorFormatado . ' ' . $unidade;
                     };
                     @endphp

@@ -28,8 +28,15 @@ class DoacaoController extends Controller
     {
         $doadores = Doador::all();
         $items = Item::orderBy('nome')->get();
+        $itemsData = $items->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'nome' => $item->nome,
+                'categoria' => $item->categoria,
+            ];
+        })->values();
 
-        return view('admin.doacoes.create', compact('doadores', 'items'));
+        return view('admin.doacoes.create', compact('doadores', 'items', 'itemsData'));
     }
 
     public function store(Request $request)
