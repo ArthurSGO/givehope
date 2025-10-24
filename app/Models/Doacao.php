@@ -56,4 +56,9 @@ class Doacao extends Model
             ->withPivot('quantidade', 'unidade')
             ->withTimestamps();
     }
+    
+    public function distribuicoes()
+    {
+        return $this->hasMany(Distribuicao::class);
+    }
 }

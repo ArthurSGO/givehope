@@ -22,4 +22,11 @@ class Item extends Model
     {
         return $this->hasMany(Estoque::class);
     }
+
+    public function distribuicoes()
+    {
+        return $this->belongsToMany(Distribuicao::class, 'distribuicao_item')
+            ->withPivot('quantidade', 'unidade', 'origem_estoque_id')
+            ->withTimestamps();
+    }
 }

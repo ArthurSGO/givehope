@@ -13,6 +13,7 @@ use App\Http\Controllers\EstoqueController;
 use App\Http\Controllers\ParoquiaController;
 use App\Http\Controllers\BeneficiarioController;
 use App\Http\Controllers\PublicDonationLookupController;
+use App\Http\Controllers\DistribuicaoController;
 
 Route::middleware(['auth', 'is_admin'])->group(function () {
     Route::get('admin', [AdminController::class, 'index'])->name('admin.dashboard');
@@ -29,6 +30,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('beneficiarios', BeneficiarioController::class);
     Route::get('/painel', [PainelController::class, 'index'])->name('painel.dashboard');
     Route::get('estoque', [EstoqueController::class, 'index'])->name('estoque.index');
+    Route::get('distribuicoes/relatorios', [DistribuicaoController::class, 'report'])->name('distribuicoes.relatorios');
+    Route::get('distribuicoes/relatorios/export', [DistribuicaoController::class, 'exportCsv'])->name('distribuicoes.relatorios.export');
+    Route::resource('distribuicoes', DistribuicaoController::class)->only(['index', 'create', 'store', 'show', 'update']);
 });
 
 Route::get('/', function () {

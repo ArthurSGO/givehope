@@ -31,6 +31,11 @@ class Beneficiario extends Model
         'data_nascimento' => 'date',
     ];
 
+    public function distribuicoes()
+    {
+        return $this->hasMany(Distribuicao::class);
+    }
+
     public function getTelefoneFormatadoAttribute(): ?string
     {
         if (empty($this->telefone)) {

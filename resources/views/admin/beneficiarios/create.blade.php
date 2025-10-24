@@ -143,6 +143,24 @@
                         <h5 class="fw-semibold border-bottom pb-2 my-4">Endereço</h5>
 
                         <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="cep" class="form-label">CEP</label>
+                                <div class="input-group">
+                                    <input
+                                        type="text"
+                                        class="form-control @error('cep') is-invalid @enderror"
+                                        id="cep"
+                                        name="cep"
+                                        value="{{ old('cep') }}"
+                                        placeholder="00000-000">
+                                    <button class="btn btn-outline-secondary" type="button" id="buscar-cep-btn">Buscar CEP</button>
+                                </div>
+                                @error('cep')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                                <div class="form-text">Se preferir, preencha o endereço manualmente.</div>
+                                <div id="cep-error" class="text-danger small mt-1" style="display: none;"></div>
+                            </div>
                             <div class="col-md-8">
                                 <label for="endereco" class="form-label">Logradouro</label>
                                 <input
@@ -220,19 +238,6 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="col-md-3">
-                                <label for="cep" class="form-label">CEP</label>
-                                <input
-                                    type="text"
-                                    class="form-control @error('cep') is-invalid @enderror"
-                                    id="cep"
-                                    name="cep"
-                                    value="{{ old('cep') }}"
-                                    placeholder="00000-000">
-                                @error('cep')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
                             <div class="col-12">
                                 <label for="ponto_referencia" class="form-label">Ponto de referência</label>
                                 <input
@@ -297,6 +302,77 @@
         });
         $('#cep').mask('00000-000', {
             clearIfNotMatch: true
+        });
+
+        const cepInput = $('#cep');
+        const cepError = $('#cep-error');
+        const buscarCepBtn = $('#buscar-cep-btn');
+        const enderecoInput = $('#endereco');
+        const bairroInput = $('#bairro');
+        const cidadeInput = $('#cidade');
+        const estadoSelect = $('#estado');
+        const complementoInput = $('#complemento');
+        const numeroInput = $('#numero');
+
+        buscarCepBtn.on('click', function() {
+            const cep = cepInput.val().replace(/\D/g, '');
+
+            cepError.hide().text('');
+
+            if (!cep) {
+                cepError.text('Informe um CEP para buscar o endereço.').show();
+                cepInput.addClass('is-invalid');
+                return;
+            }
+
+            if (cep.length !== 8) {
+                cepError.text('CEP inválido. Deve conter 8 dígitos.').show();
+                cepInput.addClass('is-invalid');
+                return;
+            }
+
+            cepInput.removeClass('is-invalid');
+            buscarCepBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Buscando...');
+
+            fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Não foi possível consultar o CEP.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.erro) {
+                        throw new Error('CEP não encontrado. Preencha os dados manualmente.');
+                    }
+
+                    if (data.logradouro) {
+                        enderecoInput.val(data.logradouro);
+                    }
+                    if (data.bairro) {
+                        bairroInput.val(data.bairro);
+                    }
+                    if (data.localidade) {
+                        cidadeInput.val(data.localidade);
+                    }
+                    if (data.uf) {
+                        estadoSelect.val(data.uf);
+                    }
+                    if (data.complemento) {
+                        complementoInput.val(data.complemento);
+                    }
+
+                    cepError.hide();
+                    numeroInput.focus();
+                })
+                .catch(error => {
+                    console.error('Erro na busca de CEP:', error);
+                    cepError.text(error.message || 'Não foi possível buscar o CEP.').show();
+                    cepInput.addClass('is-invalid');
+                })
+                .finally(() => {
+                    buscarCepBtn.prop('disabled', false).html('Buscar CEP');
+                });
         });
     });
 </script>
