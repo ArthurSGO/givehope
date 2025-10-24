@@ -7,20 +7,20 @@
 
 GiveHope é uma plataforma digital desenvolvida para auxiliar paróquias na gestão de doações e no controle de estoque de recursos recebidos. O sistema permite que as paróquias registrem as doações, gerenciem os itens em estoque e garantam que a distribuição para a comunidade seja feita de maneira organizada e transparente.
 
-## 🎯 Objetivo
+## Objetivo
 
-O principal objetivo do GiveHope é proporcionar uma ferramenta eficaz para a gestão das doações feitas para as paróquias, melhorando a organização interna. Além disso, o sistema busca aumentar a transparência do processo, proporcionando relatórios claros e garantindo que os recursos sejam distribuídos de forma justa e eficiente para quem mais precisa.
+O principal objetivo do GiveHope é proporcionar uma ferramenta eficaz para a gestão das doações feitas para as paróquias, melhorando a organização interna. Além disso, o sistema busca aumentar a transparência do processo, oferecendo relatórios claros e garantindo que os recursos sejam distribuídos de forma justa e eficiente para quem mais precisa.
 
-## ✨ Funcionalidades Principais
+## Funcionalidades Principais
 
 * **Cadastro de Doações:** Registro de todas as doações recebidas, incluindo tipo de item, quantidade e dados opcionais do doador.
 * **Controle de Estoque:** Acompanhamento em tempo real dos itens no inventário, com registro de entradas e saídas.
 * **Gestão de Distribuição:** Ferramentas para gerenciar a distribuição de recursos para famílias, indivíduos e outras entidades, garantindo controle e transparência.
 * **Relatórios e Listagens:** Geração de relatórios detalhados sobre o volume de doações, itens em estoque e distribuições realizadas.
 * **Autenticação Segura:** Sistema de login para garantir que apenas os responsáveis da paróquia acessem e gerenciem os dados.
-* **Portal da Comunidade:** Uma área no site onde a comunidade pode acompanhar eventos de arrecadação, visualizando detalhes e quantidades, promovendo a transparência e a confiança.
+* **Portal da Comunidade:** Área do site onde a comunidade pode acompanhar eventos de arrecadação, visualizando detalhes e quantidades, promovendo a transparência e a confiança.
 
-## 🚀 Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 * **Backend:** Laravel 9
 * **Frontend:** Blade, Bootstrap
@@ -29,13 +29,13 @@ O principal objetivo do GiveHope é proporcionar uma ferramenta eficaz para a ge
 * **Servidor:** Apache/Nginx
 * **Controle de Versão:** Git & GitHub
 
-## 🔧 Como Executar o Projeto
+## Como Executar o Projeto
 
 Siga os passos abaixo para configurar o ambiente de desenvolvimento local.
 
 1.  **Clone o repositório:**
     ```bash
-    git clone [https://github.com/ArthurSGO/givehope.git](https://github.com/ArthurSGO/givehope.git)
+    git clone https://github.com/ArthurSGO/givehope.git
     cd givehope
     ```
 
@@ -55,11 +55,11 @@ Siga os passos abaixo para configurar o ambiente de desenvolvimento local.
     ```
 
 5.  **Configure o banco de dados:**
-    Abra o arquivo `.env` e configure as variáveis de banco de dados (`DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`).
+    Abra o arquivo `.env` e ajuste as variáveis de banco de dados (`DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`).
 
-6.  **Execute as migrações e seeders:**
+6.  **Execute as migrações:**
     ```bash
-    php artisan migrate --seed
+    php artisan migrate
     ```
 
 7.  **Instale as dependências do frontend:**
@@ -77,9 +77,32 @@ Siga os passos abaixo para configurar o ambiente de desenvolvimento local.
     php artisan serve
     ```
 
-Acesse a aplicação em `http://127.0.0.1:8000`.
+A aplicação estará disponível em `http://127.0.0.1:8000`.
 
-## 🧑‍💻 Equipe
+## Criação de Usuário Administrador
+
+Após executar as migrações, utilize o Tinker para registrar um usuário administrador manualmente:
+
+1. Acesse o Tinker:
+   ```bash
+   php artisan tinker
+   ```
+
+2. No console interativo, execute o comando abaixo, ajustando `name`, `email` e `password` conforme necessário:
+   ```php
+   \App\Models\User::create([
+       'name' => 'Administrador',
+       'email' => 'admin@example.com',
+       'password' => bcrypt('senha-segura'),
+       'is_admin' => true,
+   ]);
+   ```
+
+3. Digite `exit` para sair do Tinker.
+
+O usuário criado poderá acessar o painel administrativo com as credenciais informadas.
+
+## Equipe
 
 * Arthur Soares Gardim - RA: 14526
 * Guilherme Ananias Calixto Ribeiro - RA: 14652
