@@ -24,18 +24,19 @@
                     <a href="{{ route('beneficiarios.create') }}" class="btn btn-success mb-3">
                         <i class="fa fa-plus"></i> Cadastrar Novo Beneficiário
                     </a>
-                    <a href="{{ route('painel.dashboard') }}" class="btn btn-secondary mb-3">
+                    <a href="{{ route('painel.dashboard') }}" class="btn btn-secondary mb-3 ms-1">
                         Voltar
                     </a>
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover">
+                        <table class="table table-striped table-hover align-middle">
                             <thead>
                                 <tr>
                                     <th>ID</th>
                                     <th>Nome</th>
                                     <th>Telefone</th>
                                     <th>Endereço</th>
-                                    <th>Ações</th>
+                                    <th>Cidade / UF</th>
+                                    <th class="text-end">Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -43,23 +44,49 @@
                                 <tr>
                                     <td>{{ $beneficiario->id }}</td>
                                     <td>{{ $beneficiario->nome }}</td>
-                                    <td>{{ $beneficiario->telefone ?? 'Não informado' }}</td>
-                                    <td>{{ $beneficiario->endereco }}</td>
+                                    <td>{{ $beneficiario->telefone_formatado ?? 'Não informado' }}</td>
                                     <td>
-                                        <a href="{{ route('beneficiarios.edit', $beneficiario->id) }}" class="btn btn-primary btn-sm m-1">
+                                        {{ $beneficiario->endereco }}
+                                        @if ($beneficiario->numero)
+                                        , {{ $beneficiario->numero }}
+                                        @endif
+                                        @if ($beneficiario->bairro)
+                                        <br><small class="text-muted">Bairro: {{ $beneficiario->bairro }}</small>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if ($beneficiario->cidade || $beneficiario->estado)
+                                        {{ $beneficiario->cidade ?? 'Cidade não informada' }}
+                                        @if ($beneficiario->estado)
+                                        / {{ $beneficiario->estado }}
+                                        @endif
+                                        @if ($beneficiario->cep_formatado)
+                                        <br><small class="text-muted">CEP: {{ $beneficiario->cep_formatado }}</small>
+                                        @endif
+                                        @else
+                                        Não informado
+                                        @endif
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="{{ route('beneficiarios.show', $beneficiario) }}"
+                                            class="btn btn-info btn-sm m-1">
+                                            <i class="fa-solid fa-eye"></i> Detalhes
+                                        </a>
+                                        <a href="{{ route('beneficiarios.edit', $beneficiario) }}"
+                                            class="btn btn-primary btn-sm m-1">
                                             <i class="fa-solid fa-pen-to-square"></i> Editar
                                         </a>
                                         <button type="button" class="btn btn-danger btn-sm m-1"
                                             data-bs-toggle="modal"
                                             data-bs-target="#confirmDeleteModal"
-                                            data-delete-url="{{ route('beneficiarios.destroy', $beneficiario->id) }}">
+                                            data-delete-url="{{ route('beneficiarios.destroy', $beneficiario) }}">
                                             <i class="fa-solid fa-trash"></i> Excluir
                                         </button>
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="5">Nenhum beneficiário cadastrado.</td>
+                                    <td colspan="6" class="text-center">Nenhum beneficiário cadastrado.</td>
                                 </tr>
                                 @endforelse
                             </tbody>
@@ -71,7 +98,6 @@
     </div>
 </div>
 
-{{-- Modal de Confirmação de Exclusão --}}
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -95,6 +121,8 @@
         </div>
     </div>
 </div>
+@endsection
+
 @push('scripts')
 <script>
     const confirmDeleteModal = document.getElementById('confirmDeleteModal');
@@ -107,4 +135,3 @@
     });
 </script>
 @endpush
-@endsection

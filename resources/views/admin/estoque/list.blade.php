@@ -27,7 +27,19 @@
                     $unidade = (float) $quantidade === 1.0 ? 'Unidade' : 'Unidades';
                     }
 
+                    if ($unidade === 'Unidade') {
+                    $unidade = (float) $quantidade === 1.0 ? 'Unidade' : 'Unidades';
+                    }
+
                     return $valorFormatado . ' ' . $unidade;
+                    };
+
+                    $formatarCategoria = function ($categoria) {
+                    if (empty($categoria)) {
+                    return '-';
+                    }
+
+                    return mb_convert_case($categoria, MB_CASE_TITLE, 'UTF-8');
                     };
                     @endphp
 
@@ -55,7 +67,7 @@
                                     @foreach ($grupo['estoques'] as $estoque)
                                     <tr>
                                         <td>{{ optional($estoque->item)->nome ?? 'Item removido' }}</td>
-                                        <td>{{ optional($estoque->item)->categoria ?? '-' }}</td>
+                                        <td>{{ $formatarCategoria(optional($estoque->item)->categoria) }}</td>
                                         <td>{{ $formatarQuantidade($estoque->quantidade, $estoque->unidade) }}</td>
                                         <td>{{ optional($estoque->updated_at)->format('d/m/Y H:i') ?? '-' }}</td>
                                     </tr>
@@ -90,7 +102,7 @@
                                 @foreach ($estoques as $estoque)
                                 <tr>
                                     <td>{{ optional($estoque->item)->nome ?? 'Item removido' }}</td>
-                                    <td>{{ optional($estoque->item)->categoria ?? '-' }}</td>
+                                    <td>{{ $formatarCategoria(optional($estoque->item)->categoria) }}</td>
                                     <td>{{ $formatarQuantidade($estoque->quantidade, $estoque->unidade) }}</td>
                                     <td>{{ optional($estoque->updated_at)->format('d/m/Y H:i') ?? '-' }}</td>
                                 </tr>
