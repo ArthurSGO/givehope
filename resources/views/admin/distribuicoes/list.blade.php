@@ -16,7 +16,10 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>{{ __('Distribuições da Paróquia') }}</span>
                     <div class="d-flex gap-2">
-                        <a href="{{ route('distribuicoes.relatorios') }}" class="btn btn-outline-secondary btn-sm">
+                        <a href="{{ route('painel.dashboard') }}" class="btn btn-secondary btn-sm">
+                            <i class="fa-solid fa-chart-pie me-1"></i> Voltar
+                        </a>
+                        <a href="{{ route('distribuicoes.relatorios') }}" class="btn btn-warning btn-sm">
                             <i class="fa-solid fa-chart-pie me-1"></i> Relatórios
                         </a>
                         <a href="{{ route('distribuicoes.create') }}" class="btn btn-primary btn-sm">
