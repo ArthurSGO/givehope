@@ -30,9 +30,13 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('beneficiarios', BeneficiarioController::class);
     Route::get('/painel', [PainelController::class, 'index'])->name('painel.dashboard');
     Route::get('estoque', [EstoqueController::class, 'index'])->name('estoque.index');
+    Route::get('distribuicoes', [DistribuicaoController::class, 'index'])->name('distribuicoes.index');
     Route::get('distribuicoes/relatorios', [DistribuicaoController::class, 'report'])->name('distribuicoes.relatorios');
     Route::get('distribuicoes/relatorios/export', [DistribuicaoController::class, 'exportCsv'])->name('distribuicoes.relatorios.export');
-    Route::resource('distribuicoes', DistribuicaoController::class)->only(['index', 'create', 'store', 'show', 'update']);
+    Route::get('distribuicoes/create', [DistribuicaoController::class, 'create'])->name('distribuicoes.create');
+    Route::post('distribuicoes', [DistribuicaoController::class, 'store'])->name('distribuicoes.store');
+    Route::get('distribuicoes/{distribuicao}', [DistribuicaoController::class, 'show'])->name('distribuicoes.show');
+    Route::put('distribuicoes/{distribuicao}', [DistribuicaoController::class, 'update'])->name('distribuicoes.update');
 });
 
 Route::get('/', function () {
