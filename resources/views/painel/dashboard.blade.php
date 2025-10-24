@@ -18,6 +18,24 @@
     <div class="row">
 
         <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2" data-icon="🧑‍🤝‍🧑">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Cadastrar</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">Novo Doador</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-plus fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                    <a href="{{ route('doadores.create', ['redirect_to' => route('painel.dashboard')]) }}" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
             <div class="card border-left-primary shadow h-100 py-2" data-icon="➕">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
@@ -36,11 +54,11 @@
         </div>
 
         <div class="col-xl-4 col-md-6 mb-4">
-            <div class="card border-left-danger shadow h-100 py-2" data-icon="🚚">
+            <div class="card border-left-success shadow h-100 py-2" data-icon="🚚">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 Cadastrar</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">Nova Distribuição</div>
                         </div>
@@ -54,47 +72,11 @@
         </div>
 
         <div class="col-xl-4 col-md-6 mb-4">
-            <div class="card border-left-secondary shadow h-100 py-2" data-icon="📋">
+            <div class="card border-left-warning shadow h-100 py-2 card-icon-beneficiarios" data-icon="👥">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Gerenciar</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">Todas as Doações</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-list fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                    <a href="{{ route('doacoes.index') }}" class="stretched-link"></a>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-4 col-md-6 mb-4">
-            <div class="card border-left-dark shadow h-100 py-2" data-icon="📦">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-dark text-uppercase mb-1">
-                                Gerenciar</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">Distribuições</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-people-carry-box fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                    <a href="{{ route('distribuicoes.index') }}" class="stretched-link"></a>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-xl-4 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2 card-icon-beneficiarios" data-icon="👥">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 Cadastrar/Editar</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">Beneficiários</div>
                         </div>
@@ -108,11 +90,47 @@
         </div>
 
         <div class="col-xl-4 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2" data-icon="📊">
+            <div class="card border-left-primary shadow h-100 py-2" data-icon="📋">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Gerenciar</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">Todas as Doações</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-list fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                    <a href="{{ route('doacoes.index') }}" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2" data-icon="📦">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Gerenciar</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">Distribuições</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-people-carry-box fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                    <a href="{{ route('distribuicoes.index') }}" class="stretched-link"></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2" data-icon="📊">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                 Consultar</div>
                             <div class="h5 mb-0 font-weight-bold text-gray-800">Estoque</div>
                         </div>
@@ -125,32 +143,15 @@
             </div>
         </div>
 
-        <div class="col-xl-4 col-md-6 mb-4">
-            <div class="card border-left-warning shadow h-100 py-2" data-icon="🧑‍🤝‍🧑">
-                <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                Ação Rápida</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">Novo Doador</div>
-                        </div>
-                        <div class="col-auto">
-                            <i class="fas fa-user-plus fa-2x text-gray-300"></i>
-                        </div>
-                    </div>
-                    <a href="{{ route('doadores.create', ['redirect_to' => route('painel.dashboard')]) }}" class="stretched-link"></a>
-                </div>
-            </div>
-        </div>
 
         <div class="col-xl-4 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2 card-icon-item" data-icon="📦">
+            <div class="card border-left-primary shadow h-100 py-2 card-icon-item" data-icon="📦">
                 <div class="card-body">
                     <div class="row no-gutters align-items-center">
                         <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                 Cadastrar/Editar</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">Itens</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">Itens</div> {{-- Corrigido de 'classs' para 'class' --}}
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-inbox fa-2x text-gray-300"></i>
@@ -169,9 +170,30 @@
             border-left: 0.25rem solid #4e73df !important;
         }
 
+        .card .border-left-success {
+            border-left: 0.25rem solid #1cc88a !important;
+        }
+
+        .card .border-left-danger {
+            border-left: 0.25rem solid #e74a3b !important;
+        }
+
+        .card .border-left-info {
+            border-left: 0.25rem solid #36b9cc !important;
+        }
+
         .card .border-left-secondary {
             border-left: 0.25rem solid #858796 !important;
         }
+
+        .card .border-left-warning {
+            border-left: 0.25rem solid #f6c23e !important;
+        }
+
+        .card .border-left-dark {
+            border-left: 0.25rem solid #5a5c69 !important;
+        }
+
 
         .card a.stretched-link::after {
             content: "";
@@ -218,22 +240,6 @@
 
         .card-icon-item::before {
             top: 70%;
-        }
-
-        .card .border-left-warning {
-            border-left: 0.25rem solid #f6c23e !important;
-        }
-
-        .card .border-left-info {
-            border-left: 0.25rem solid #36b9cc !important;
-        }
-
-        .card .border-left-danger {
-            border-left: 0.25rem solid #e74a3b !important;
-        }
-
-        .card .border-left-dark {
-            border-left: 0.25rem solid #5a5c69 !important;
         }
     </style>
     @endpush
