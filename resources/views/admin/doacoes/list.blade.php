@@ -43,6 +43,8 @@
                                         <td>
                                             @if($doacao->unidade == 'R$')
                                             {{ $doacao->unidade }} {{ number_format($doacao->quantidade, 2, ',', '.') }}
+                                            @elseif ($doacao->items->count() > 1)
+                                            Múltiplos itens
                                             @else
                                             {{ $doacao->quantidade }} {{ $doacao->unidade }}
                                             @endif

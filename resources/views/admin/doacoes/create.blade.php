@@ -1,6 +1,18 @@
 @extends('app')
 @section('title', 'Registrar doação')
 @section('content')
+<style>
+    .form-control[type=number]::-webkit-outer-spin-button,
+    .form-control[type=number]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .form-control[type=number] {
+        -moz-appearance: textfield;
+    }
+</style>
+
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -120,7 +132,7 @@
 
                                     <div class="col-md-3">
                                         <label for="item_quantidade" class="form-label">Qtd.</label>
-                                        <input type="number" id="item_quantidade" class="form-control" step="0.01">
+                                        <input type="number" id="item_quantidade" class="form-control text-decoration-none" step="0.1">
                                     </div>
                                     <div class="col-md-2">
                                         <label for="item_unidade" class="form-label">Un.</label>
