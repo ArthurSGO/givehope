@@ -16,6 +16,19 @@
     @stack('styles')
     
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+
+    <style>
+    .form-control[type=number]::-webkit-outer-spin-button,
+    .form-control[type=number]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .form-control[type=number] {
+        -moz-appearance: textfield;
+    }
+</style>
+
 </head>
 
 <body class="d-flex flex-column min-vh-100">

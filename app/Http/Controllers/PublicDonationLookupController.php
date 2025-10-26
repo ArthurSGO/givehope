@@ -42,11 +42,33 @@ class PublicDonationLookupController extends Controller
                 if ($doador) {
                     $doador->documento_formatado = $this->formatDocument($doador->cpf_cnpj);
                     $doacoes = $doador->doacoes->map(function ($doacao) {
-                        $doacao->status_distribuicao = $doacao->descricao
-                            ? 'Distribuição registrada'
-                            : 'Distribuição pendente';
-                        $doacao->status_badge = $doacao->descricao ? 'success' : 'warning';
+                    $distribuicao = $doacao->distribuicoes()->latest()->first();
 
+                    if ($distribuicao) {
+                        switch ($distribuicao->status) {
+                            case 'reservado':
+                                $doacao->status_distribuicao = 'Distribuição reservada';
+                                $doacao->status_badge = 'warning';
+                                break;
+
+                            case 'enviado':
+                                $doacao->status_distribuicao = 'Distribuição enviada';
+                                $doacao->status_badge = 'primary';
+                                break;
+
+                            case 'entregue':
+                                $doacao->status_distribuicao = 'Distribuição entregue';
+                                $doacao->status_badge = 'success';
+                                break;
+
+                            default:
+                                $doacao->status_distribuicao = ucfirst($distribuicao->status);
+                                $doacao->status_badge = 'secondary';
+                        }
+                    } else {
+                        $doacao->status_distribuicao = 'Registrado';
+                        $doacao->status_badge = 'secondary';
+                    }
                         if ($doacao->tipo === 'dinheiro' && $doacao->quantidade !== null) {
                             $doacao->quantidade_formatada = $this->formatQuantity((float) $doacao->quantidade, $doacao->unidade ?? 'R$');
                         }

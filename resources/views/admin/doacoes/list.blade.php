@@ -42,11 +42,16 @@
                                         <td>{{ ucfirst($doacao->tipo) }}</td>
                                         <td>
                                             @if($doacao->unidade == 'R$')
-                                            {{ $doacao->unidade }} {{ number_format($doacao->quantidade, 2, ',', '.') }}
+                                                {{ $doacao->unidade }} {{ number_format($doacao->quantidade, 2, ',', '.') }}
                                             @elseif ($doacao->items->count() > 1)
-                                            Múltiplos itens
+                                                Múltiplos itens
+                                            @elseif ($doacao->items->count() == 1)
+                                                @php
+                                                    $item = $doacao->items->first();
+                                                @endphp
+                                                {{ $item->pivot->quantidade }} {{ $item->pivot->unidade }}
                                             @else
-                                            {{ $doacao->quantidade }} {{ $doacao->unidade }}
+                                                -
                                             @endif
                                         </td>
                                         <td>{{ $doacao->descricao ?? '-' }}</td>
