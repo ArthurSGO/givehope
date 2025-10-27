@@ -57,8 +57,14 @@ class Doacao extends Model
             ->withTimestamps();
     }
     
-    public function distribuicoes()
-    {
-        return $this->hasMany(Distribuicao::class);
-    }
+public function distribuicoes()
+{
+    return $this->belongsToMany(
+        Distribuicao::class,
+        'distribuicao_item',
+        'item_id',
+        'distribuicao_id'
+    )->withTimestamps();
+}
+
 }
