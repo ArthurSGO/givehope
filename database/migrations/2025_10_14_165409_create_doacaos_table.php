@@ -20,7 +20,7 @@ return new class extends Migration
             $table->enum('tipo', ['dinheiro', 'item']);
             $table->string('descricao')->nullable();
             $table->decimal('quantidade', 12, 2)->nullable();
-            $table->enum('unidade', ['R$', 'Unidade', 'Kg']);
+            $table->string('unidade', 50)->nullable();
             $table->date('data_doacao');
             $table->timestamps();
         });
