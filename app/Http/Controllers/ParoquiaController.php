@@ -23,13 +23,23 @@ class ParoquiaController extends Controller
 
     public function store(Request $request)
     {
+        $cnpjSanitizado = preg_replace('/[^\d]/', '', (string) $request->cnpj);
+        $telefoneSanitizado = preg_replace('/[^\d]/', '', (string) $request->telefone);
+        $telefoneSanitizado = $telefoneSanitizado !== '' ? $telefoneSanitizado : null;
+
         $request->merge([
-            'cnpj' => preg_replace('/[^\d]/', '', $request->cnpj),
-            'telefone' => preg_replace('/[^\d]/', '', $request->telefone),
+            'cnpj' => $cnpjSanitizado,
+            'telefone' => $telefoneSanitizado,
         ]);
 
         $validatedCnpj = $request->validate([
             'cnpj' => 'required|string|unique:paroquias,cnpj|size:14',
+        ]);
+
+        $request->validate([
+            'telefone' => ['nullable', 'digits_between:10,11'],
+            'email' => ['nullable', 'email', 'max:255'],
+            'numero' => ['nullable', 'string', 'max:10'],
         ]);
 
         $response = Http::get("https://receitaws.com.br/v1/cnpj/{$validatedCnpj['cnpj']}");
@@ -37,6 +47,13 @@ class ParoquiaController extends Controller
         $dadosParaSalvar = [];
         if ($response->successful() && $response->json('status') === 'OK') {
             $apiData = $response->json();
+            $telefoneApi = preg_replace('/[^\d]/', '', $apiData['telefone'] ?? '');
+            $telefoneApi = $telefoneApi !== '' ? $telefoneApi : null;
+            if ($telefoneApi && !preg_match('/^\d{10,11}$/', $telefoneApi)) {
+                $telefoneApi = null;
+            }
+
+            $telefoneFinal = $request->telefone ?? $telefoneApi;
             $dadosParaSalvar = [
                 'nome'              => $apiData['nome'],
                 'nome_fantasia'     => $apiData['fantasia'] ?? null,
@@ -51,7 +68,7 @@ class ParoquiaController extends Controller
                 'cep'               => preg_replace('/[^\d]/', '', $apiData['cep'] ?? ''),
                 'cidade'            => $apiData['municipio'] ?? $request->cidade,
                 'estado'            => $apiData['uf'] ?? $request->estado,
-                'telefone'          => preg_replace('/[^\d]/', '', $apiData['telefone'] ?? '') ?: $request->telefone,
+                'telefone'          => $telefoneFinal,
                 'email'             => $apiData['email'] ?? $request->email,
             ];
         } else {
@@ -62,7 +79,7 @@ class ParoquiaController extends Controller
                 'email' => 'nullable|email|max:255',
                 'cidade' => 'required|string|max:100',
                 'estado' => 'required|string|max:100',
-                'telefone' => 'nullable|string|max:11',
+                'telefone' => ['nullable', 'digits_between:10,11'],
                 'numero' => 'nullable|string|max:10',
             ]);
         }
@@ -70,7 +87,7 @@ class ParoquiaController extends Controller
         Paroquia::create($dadosParaSalvar);
 
         return redirect()->route('paroquias.index')
-                         ->with('success', 'Paróquia cadastrada com sucesso!');
+            ->with('success', 'Paróquia cadastrada com sucesso!');
     }
 
     public function show(Paroquia $paroquia)
@@ -86,20 +103,25 @@ class ParoquiaController extends Controller
 
     public function update(Request $request, Paroquia $paroquia)
     {
+        $cnpjSanitizado = preg_replace('/[^\d]/', '', (string) $request->cnpj);
+        $telefoneSanitizado = preg_replace('/[^\d]/', '', (string) $request->telefone);
+        $telefoneSanitizado = $telefoneSanitizado !== '' ? $telefoneSanitizado : null;
+
         $request->merge([
-            'cnpj' => preg_replace('/[^\d]/', '', $request->cnpj),
-            'telefone' => preg_replace('/[^\d]/', '', $request->telefone),
+            'cnpj' => $cnpjSanitizado,
+            'telefone' => $telefoneSanitizado,
         ]);
 
         $request->validate([
-            'nome' => 'required|string|max:255',
-            'cnpj' => ['required', 'string', 'size:14', Rule::unique('paroquias')->ignore($paroquia->id)],
+            'telefone' => ['nullable', 'digits_between:10,11'],
+            'email' => ['nullable', 'email', 'max:255'],
+            'numero' => ['nullable', 'string', 'max:10'],
         ]);
-        
+
         $paroquia->update($request->all());
 
         return redirect()->route('paroquias.index')
-                         ->with('success', 'Paróquia atualizada com sucesso!');
+            ->with('success', 'Paróquia atualizada com sucesso!');
     }
 
     public function destroy(Paroquia $paroquia)
