@@ -76,7 +76,7 @@
                                     <option value="">Selecione uma paróquia (Obrigatório para Responsáveis)</option>
                                     @foreach ($paroquias as $paroquia)
                                         <option value="{{ $paroquia->id }}" {{ old('paroquia_id') == $paroquia->id ? 'selected' : '' }}>
-                                            {{ $paroquia->nome }}
+                                           {{ $paroquia->nome_fantasia }}
                                         </option>
                                     @endforeach
                                 </select>

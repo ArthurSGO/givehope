@@ -17,7 +17,7 @@
                     <span>{{ __('Distribuições da Paróquia') }}</span>
                     <div class="d-flex gap-2">
                         <a href="{{ route('painel.dashboard') }}" class="btn btn-secondary btn-sm">
-                            <i class="fa-solid fa-chart-pie me-1"></i> Voltar
+                            <i class="fa-solid fa-arrow-left"></i> Voltar
                         </a>
                         <a href="{{ route('distribuicoes.relatorios') }}" class="btn btn-warning btn-sm">
                             <i class="fa-solid fa-chart-pie me-1"></i> Relatórios

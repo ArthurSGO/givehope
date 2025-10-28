@@ -64,16 +64,33 @@
                 @if($doacao->tipo === 'dinheiro')
                 <p class="fs-5 fw-semibold text-success mb-3">{{ $doacao->quantidade_formatada ?? 'Valor não informado' }}</p>
                 @else
-                @if($doacao->items->isNotEmpty())
-                <p class="text-muted mb-2">Itens doados:</p>
-                <ul class="list-group list-group-flush">
-                    @foreach($doacao->items as $item)
-                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                        <span>{{ $item->nome }}</span>
-                        <span class="fw-semibold">{{ $item->quantidade_formatada ?? $item->pivot->quantidade.' '.$item->pivot->unidade }}</span>
-                    </li>
-                    @endforeach
-                </ul>
+                @if(isset($doacao->detalhes_estoque) && $doacao->detalhes_estoque->isNotEmpty())
+                <p class="text-muted mb-2">Acompanhamento do estoque para cada item doado:</p>
+                <div class="table-responsive mb-3">
+                    <table class="table table-sm table-borderless align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Item</th>
+                                <th class="text-end">Doado</th>
+                                <th class="text-end">Reservado</th>
+                                <th class="text-end">Enviado</th>
+                                <th class="text-end">Entregue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($doacao->detalhes_estoque as $item)
+                            <tr>
+                                <td class="fw-semibold">{{ $item['nome'] }}</td>
+                                <td class="text-end">{{ $item['quantidade_doada'] }}</td>
+                                <td class="text-end">{{ $item['reservado'] }}</td>
+                                <td class="text-end">{{ $item['enviado'] }}</td>
+                                <td class="text-end">{{ $item['entregue'] }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <p class="small text-muted mb-3">Reservas, envios e entregas são distribuídos considerando a ordem em que as doações foram registradas pela paróquia. O saldo disponível indica o que ainda pode ser direcionado desta doação específica, enquanto o saldo na paróquia mostra o estoque total desse item disponível para todos os beneficiários.</p>
                 @else
                 <p class="text-muted">Nenhum item detalhado para esta doação.</p>
                 @endif
