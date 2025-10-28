@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Doador;
-use App\Models\Doacao;
+use Illuminate\Validation\Rule;
 
 class DoadorController extends Controller
 {
@@ -98,12 +98,41 @@ class DoadorController extends Controller
      */
     public function update(Request $request, Doador $doador)
     {
+        $cleanData = [];
+
+        if ($request->filled('cpf_cnpj')) {
+            $cleanData['cpf_cnpj'] = preg_replace('/[^0-9]/', '', $request->input('cpf_cnpj'));
+        }
+
+        if ($request->filled('telefone')) {
+            $cleanData['telefone'] = preg_replace('/[^0-9]/', '', $request->input('telefone'));
+        }
+
+        if ($request->filled('cep')) {
+            $cleanData['cep'] = preg_replace('/[^0-9]/', '', $request->input('cep'));
+        }
+
+        $request->merge($cleanData);
+
         $request->validate([
             'nome' => 'required|string|max:255',
-            'cpf_cnpj' => 'nullable|string|max:14',
+
+            'cpf_cnpj' => [
+                'nullable',
+                'string',
+                'max:14',
+                Rule::unique('doadores', 'cpf_cnpj')->ignore($doador->id),
+            ],
+
             'telefone' => 'nullable|string|max:11',
+
+            'cep' => 'nullable|string|max:8',
+            'logradouro' => 'nullable|string|max:255',
+            'numero' => 'nullable|string|max:50',
+            'cidade' => 'nullable|string|max:100',
+            'estado' => 'nullable|string|max:2',
         ]);
-        
+
         $doador->update($request->all());
 
         return redirect()->route('doadores.index')

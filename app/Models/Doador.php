@@ -11,6 +11,7 @@ class Doador extends Model
 
     protected $table = 'doadores';
 
+    // Campos que podem ser preenchidos via create() ou update()
     protected $fillable = [
         'nome',
         'cpf_cnpj',
@@ -20,7 +21,7 @@ class Doador extends Model
         'numero',
         'cidade',
         'estado',
-    ];
+    ]; //
 
     public function doacoes()
     {

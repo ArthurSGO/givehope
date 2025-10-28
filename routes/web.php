@@ -26,7 +26,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('items', ItemController::class);
     Route::resource('doacoes', DoacaoController::class);
     Route::get('/doadores/buscar', [DoadorController::class, 'buscar'])->name('doadores.buscar');
-    Route::resource('doadores', DoadorController::class);
+    Route::resource('doadores', DoadorController::class)->parameter('doadores', 'doador');
     Route::resource('beneficiarios', BeneficiarioController::class);
     Route::get('/painel', [PainelController::class, 'index'])->name('painel.dashboard');
     Route::get('estoque', [EstoqueController::class, 'index'])->name('estoque.index');
