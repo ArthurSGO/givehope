@@ -5,7 +5,7 @@
 <div class="container">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Painel da Paróquia: <strong>{{ Auth::user()->paroquia->nome_fantasia ?? 'Não associada' }}</strong></h1>
+        <h1 class="h3 mb-0 text-gray-800">Painel da Paróquia: <strong>{{ $user->paroquia->nome_fantasia ?? 'Não associada' }}</strong></h1>
     </div>
 
     @if (session('success'))
@@ -14,6 +14,87 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
     @endif
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="h4 mb-0 text-gray-800">Resumo (Últimos 30 dias)</h2>
+    </div>
+
+    <div class="row">
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">
+                                Doações (Dinheiro)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">R$ {{ number_format($stats['doacoes_30d'] ?? 0, 2, ',', '.') }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">
+                                Distribuições</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['distribuicoes_30d'] ?? 0 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-truck-ramp-box fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">
+                                Beneficiários Atendidos</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['beneficiarios_atendidos'] ?? 0 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">
+                                Itens em Estoque</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stats['itens_em_estoque'] ?? 0 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-boxes-stacked fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="my-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h4 mb-0 text-gray-800">Acesso Rápido</h2>
+    </div>
 
     <div class="row">
 
@@ -114,7 +195,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 Gerenciar</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">Distribuições</div>
+                            <div classs="h5 mb-0 font-weight-bold text-gray-800">Distribuições</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-people-carry-box fa-2x text-gray-300"></i>
@@ -151,7 +232,7 @@
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                 Cadastrar/Editar</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">Itens</div> {{-- Corrigido de 'classs' para 'class' --}}
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">Itens</div>
                         </div>
                         <div class="col-auto">
                             <i class="fas fa-inbox fa-2x text-gray-300"></i>

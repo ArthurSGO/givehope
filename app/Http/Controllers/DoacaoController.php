@@ -275,4 +275,123 @@ class DoacaoController extends Controller
     {
         //
     }
+
+    public function report(Request $request)
+    {
+        $user = Auth::user();
+        $filtros = $request->validate([
+            'data_inicio' => ['nullable', 'date'],
+            'data_fim' => ['nullable', 'date', 'after_or_equal:data_inicio'],
+            'doador_id' => ['nullable', 'exists:doadores,id'],
+            'tipo' => ['nullable', 'in:dinheiro,item'],
+        ]);
+
+        $dadosRelatorio = $this->montarConsultaRelatorio($filtros, $user->paroquia_id)->paginate(20);
+        $doadores = Doador::orderBy('nome')->get();
+
+        return view('admin.doacoes.relatorios', [
+            'dadosRelatorio' => $dadosRelatorio,
+            'doadores' => $doadores,
+            'filtros' => $filtros,
+        ]);
+    }
+
+    public function exportCsv(Request $request)
+    {
+        $user = Auth::user();
+        $filtros = $request->validate([
+            'data_inicio' => ['nullable', 'date'],
+            'data_fim' => ['nullable', 'date', 'after_or_equal:data_inicio'],
+            'doador_id' => ['nullable', 'exists:doadores,id'],
+            'tipo' => ['nullable', 'in:dinheiro,item'],
+        ]);
+
+        $linhas = $this->montarConsultaRelatorio($filtros, $user->paroquia_id)->get();
+        $nomeArquivo = 'relatorio-doacoes-' . now()->format('Ymd_His') . '.csv';
+
+        return response()->streamDownload(function () use ($linhas) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, ['Data', 'Doador', 'Tipo', 'Valor (R$)', 'Itens (Qtd)', 'Unidade']);
+
+            foreach ($linhas as $linha) {
+
+                $quantidadeItens = 'N/A';
+                $unidadeItens = 'N/A';
+
+                if ($linha->tipo === 'item') {
+                    $quantidade = (float) $linha->total_itens;
+                    $unidade = $linha->unidade_itens;
+                    $casasDecimais = ($unidade === 'Kg') ? 3 : 0;
+                    $valorFormatado = number_format($quantidade, $casasDecimais, ',', '.');
+
+                    if ($casasDecimais > 0) {
+                        $valorFormatado = rtrim(rtrim($valorFormatado, '0'), ',');
+                    }
+
+                    $quantidadeItens = $valorFormatado;
+                    $unidadeItens = $unidade;
+                    if ($unidade === 'Unidade' && $quantidade != 1.0) {
+                        $unidadeItens = 'Unidades';
+                    }
+                }
+
+                fputcsv($handle, [
+                    \Carbon\Carbon::parse($linha->data_doacao)->format('d/m/Y'),
+                    $linha->doador->nome,
+                    $linha->tipo,
+                    $linha->tipo === 'dinheiro' ? number_format($linha->quantidade, 2, ',', '.') : 'N/A',
+                    $quantidadeItens,
+                    $unidadeItens,
+                ]);
+            }
+
+            fclose($handle);
+        }, $nomeArquivo, [
+            'Content-Type' => 'text/csv',
+        ]);
+    }
+
+    protected function montarConsultaRelatorio(array $filtros, int $paroquiaId)
+    {
+        $query = Doacao::with(['doador'])
+            ->where('paroquia_id', $paroquiaId)
+            ->select('doacoes.*')
+            ->selectRaw('SUM(doacao_item.quantidade) as total_itens')
+            ->selectRaw('doacao_item.unidade as unidade_itens')
+            ->leftJoin('doacao_item', 'doacoes.id', '=', 'doacao_item.doacao_id');
+
+        if (!empty($filtros['doador_id'])) {
+            $query->where('doador_id', $filtros['doador_id']);
+        }
+
+        if (!empty($filtros['tipo'])) {
+            $query->where('tipo', $filtros['tipo']);
+        }
+
+        if (!empty($filtros['data_inicio'])) {
+            $query->whereDate('data_doacao', '>=', $filtros['data_inicio']);
+        }
+
+        if (!empty($filtros['data_fim'])) {
+            $query->whereDate('data_doacao', '<=', $filtros['data_fim']);
+        }
+
+        $query->orderBy('data_doacao', 'desc');
+
+        $query->groupBy(
+            'doacoes.id',
+            'doacoes.paroquia_id',
+            'doacoes.doador_id',
+            'doacoes.tipo',
+            'doacoes.quantidade',
+            'doacoes.unidade',
+            'doacoes.descricao',
+            'doacoes.data_doacao',
+            'doacoes.created_at',
+            'doacoes.updated_at',
+            'doacao_item.unidade'
+        );
+
+        return $query;
+    }
 }
