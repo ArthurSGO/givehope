@@ -11,6 +11,9 @@
     <title>@yield('title')</title>
     <script>
         (function () {
+            if (window.themeTransitioning) {
+                return;
+            }
             const getStoredTheme = () => localStorage.getItem('theme');
             const getPreferredTheme = () => {
                 const storedTheme = getStoredTheme();
@@ -81,8 +84,9 @@
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
-                                                             document.getElementById('logout-form').submit();">
+                                    <a class="dropdown-item" href="{{ route('logout') }}"
+                                        onclick="event.preventDefault();
+                                                                                         document.getElementById('logout-form').submit();">
                                         {{ __('Logout') }}
                                     </a>
 
@@ -92,6 +96,16 @@
                                 </div>
                             </li>
                         @endguest
+                    </ul>
+                    <ul class="navbar-nav ms-2">
+                        <li class="nav-item">
+                            <button class="btn nav-link px-2" onclick="toggleTheme()" aria-label="Toggle theme">
+                                <span class="theme-icon-wrapper">
+                                    <i class="fa-solid fa-sun theme-icon theme-icon-light"></i>
+                                    <i class="fa-solid fa-moon theme-icon theme-icon-dark"></i>
+                                </span>
+                            </button>
+                        </li>
                     </ul>
                 </div>
             </div>
