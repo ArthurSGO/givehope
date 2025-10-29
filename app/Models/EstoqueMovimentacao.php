@@ -9,42 +9,36 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class EstoqueMovimentacao extends Model
 {
     use HasFactory;
-
     protected $table = 'estoque_movimentacoes';
-
-    protected $fillable = [
-        'estoque_id',
-        'paroquia_id',
-        'item_id',
-        'distribuicao_id',
-        'user_id',
-        'tipo',
-        'quantidade',
-        'unidade',
-        'motivo',
-    ];
-
+    protected $guarded = [];
     protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
         'quantidade' => 'float',
     ];
 
-    public function estoque(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(Estoque::class);
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function item(): BelongsTo
+    public function doacao(): BelongsTo
     {
-        return $this->belongsTo(Item::class);
+        return $this->belongsTo(Doacao::class, 'doacao_id');
     }
 
     public function distribuicao(): BelongsTo
     {
-        return $this->belongsTo(Distribuicao::class);
+        return $this->belongsTo(Distribuicao::class, 'distribuicao_id');
     }
 
-    public function user(): BelongsTo
+    public function item(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(Item::class, 'item_id');
+    }
+
+    public function estoque(): BelongsTo
+    {
+        return $this->belongsTo(Estoque::class, 'estoque_id');
     }
 }

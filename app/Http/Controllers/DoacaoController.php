@@ -80,6 +80,7 @@ class DoacaoController extends Controller
         $doacao->tipo = $validatedData['tipo'];
         $doacao->descricao = $validatedData['descricao'];
         $paroquiaId = Auth::user()->paroquia_id;
+        $userId = Auth::id();
         $doacao->paroquia_id = $paroquiaId;
         $doacao->doador_id = $doadorId;
 
@@ -167,7 +168,7 @@ class DoacaoController extends Controller
             }
 
             if (!empty($itemsToAttach)) {
-                DB::transaction(function () use ($doacao, $itemsToAttach, $paroquiaId) {
+                DB::transaction(function () use ($doacao, $itemsToAttach, $paroquiaId, $userId) {
                     $doacao->quantidade = null;
                     $doacao->unidade = null;
                     $doacao->save();
@@ -183,6 +184,18 @@ class DoacaoController extends Controller
 
                         $estoque->quantidade = round(($estoque->quantidade ?? 0) + $itemData['quantidade'], 3);
                         $estoque->save();
+
+                        \App\Models\EstoqueMovimentacao::create([
+                            'estoque_id' => $estoque->id,
+                            'paroquia_id' => $paroquiaId,
+                            'item_id' => $itemId,
+                            'doacao_id' => $doacao->id,
+                            'user_id' => $userId,
+                            'tipo' => 'entrada',
+                            'quantidade' => $itemData['quantidade'],
+                            'unidade' => $itemData['unidade'],
+                            'motivo' => 'Doação recebida',
+                        ]);
                     }
                 });
             } else {

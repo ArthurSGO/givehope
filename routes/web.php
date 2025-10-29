@@ -30,6 +30,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('beneficiarios', BeneficiarioController::class);
     Route::get('/painel', [PainelController::class, 'index'])->name('painel.dashboard');
     Route::get('estoque', [EstoqueController::class, 'index'])->name('estoque.index');
+    Route::get('estoque/{estoque}', [EstoqueController::class, 'show'])->name('estoque.show');
     Route::get('distribuicoes', [DistribuicaoController::class, 'index'])->name('distribuicoes.index');
     Route::get('distribuicoes/relatorios', [DistribuicaoController::class, 'report'])->name('distribuicoes.relatorios');
     Route::get('distribuicoes/relatorios/export', [DistribuicaoController::class, 'exportCsv'])->name('distribuicoes.relatorios.export');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Estoque;
 use Illuminate\Http\Request;
+use App\Models\EstoqueMovimentacao;
 use Illuminate\Support\Facades\Auth;
 
 class EstoqueController extends Controller
@@ -62,9 +63,22 @@ class EstoqueController extends Controller
         //
     }
 
-    public function show($id)
+    public function show(Estoque $estoque)
     {
-        //
+        $user = Auth::user();
+        if ($estoque->paroquia_id !== $user->paroquia_id) {
+            abort(404);
+        }
+
+        $estoque->load('item');
+
+        $movimentacoes = EstoqueMovimentacao::with(['user', 'doacao', 'distribuicao'])
+            ->where('estoque_id', $estoque->id)
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        return view('admin.estoque.show', compact('estoque', 'movimentacoes'));
+
     }
 
     public function edit($id)
