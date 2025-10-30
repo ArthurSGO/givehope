@@ -385,10 +385,14 @@ class DoacaoController extends Controller
 
                 if ($tipoOriginal === 'item') {
                     foreach ($doacao->items as $itemAntigo) {
-                        $estoque = Estoque::firstOrNew([
-                            'item_id' => $itemAntigo->id,
-                            'paroquia_id' => $doacao->paroquia_id,
-                        ]);
+                        $estoque = Estoque::where('item_id', $itemAntigo->id)
+                            ->where('paroquia_id', $doacao->paroquia_id)
+                            ->where('unidade', $itemAntigo->pivot->unidade)
+                            ->first();
+
+                        if (!$estoque) {
+                            throw new \Exception("Não foi possível localizar o estoque do item '{$itemAntigo->nome}' para estorno da edição.");
+                        }
 
                         $quantidadeEstorno = (float) $itemAntigo->pivot->quantidade;
                         if ($estoque->quantidade < $quantidadeEstorno) {
@@ -399,9 +403,13 @@ class DoacaoController extends Controller
 
                         EstoqueMovimentacao::create([
                             'estoque_id' => $estoque->id,
+                            'paroquia_id' => $estoque->paroquia_id,
+                            'item_id' => $estoque->item_id,
+                            'doacao_id' => $doacao->id,
                             'tipo' => 'estorno_edicao',
                             'quantidade' => -$quantidadeEstorno,
                             'unidade' => $itemAntigo->pivot->unidade,
+                            'motivo' => 'Estorno de edição de doação',
                             'user_id' => $user->id,
                         ]);
                     }
@@ -465,15 +473,26 @@ class DoacaoController extends Controller
                             'unidade' => $itemData['unidade'],
                         ];
 
-                        Estoque::entrada(
-                            $itemId,
-                            $doacao->paroquia_id,
-                            (float) $itemData['quantidade'],
-                            $itemData['unidade'],
-                            Doacao::class,
-                            $doacao->id,
-                            $user->id
-                        );
+                        $estoque = Estoque::firstOrNew([
+                            'paroquia_id' => $doacao->paroquia_id,
+                            'item_id' => $itemId,
+                            'unidade' => $itemData['unidade'],
+                        ]);
+
+                        $estoque->quantidade = round(($estoque->quantidade ?? 0) + (float) $itemData['quantidade'], 3);
+                        $estoque->save();
+
+                        EstoqueMovimentacao::create([
+                            'estoque_id' => $estoque->id,
+                            'paroquia_id' => $estoque->paroquia_id,
+                            'item_id' => $estoque->item_id,
+                            'doacao_id' => $doacao->id,
+                            'user_id' => $user->id,
+                            'tipo' => 'entrada_edicao',
+                            'quantidade' => (float) $itemData['quantidade'],
+                            'unidade' => $itemData['unidade'],
+                            'motivo' => 'Entrada por edição de doação',
+                        ]);
                     }
 
                     $doacao->items()->sync($itemsParaSincronizar);
