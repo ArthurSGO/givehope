@@ -92,7 +92,7 @@ Após executar as migrações, utilize o Tinker para registrar um usuário admin
    ```php
    \App\Models\User::create([
        'name' => 'Administrador',
-       'email' => 'admin@example.com',
+       'email' => 'admin@givehope.com',
        'password' => bcrypt('admin123'),
        'is_admin' => true,
    ]);

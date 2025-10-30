@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('paroquia_id')->constrained()->cascadeOnDelete();
             $table->foreignId('item_id')->constrained()->cascadeOnDelete();
             $table->foreignId('distribuicao_id')->nullable()->constrained('distribuicoes')->nullOnDelete();
+            $table->foreignId('doacao_id')->nullable()->constrained('doacoes')->nullOnDelete();
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
             $table->string('tipo', 20);
             $table->decimal('quantidade', 12, 3);
