@@ -26,7 +26,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('items', ItemController::class);
     Route::get('doacoes/relatorios', [DoacaoController::class, 'report'])->name('doacoes.relatorios');
     Route::get('doacoes/relatorios/export', [DoacaoController::class, 'exportCsv'])->name('doacoes.relatorios.export');
-    Route::resource('doacoes', DoacaoController::class);
+    Route::resource('doacoes', DoacaoController::class)->parameters(['doacoes' => 'doacao']);
     Route::get('/doadores/buscar', [DoadorController::class, 'buscar'])->name('doadores.buscar');
     Route::resource('doadores', DoadorController::class)->parameter('doadores', 'doador');
     Route::resource('beneficiarios', BeneficiarioController::class);

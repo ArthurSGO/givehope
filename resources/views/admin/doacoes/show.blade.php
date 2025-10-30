@@ -8,7 +8,7 @@
             <div class="card mb-4 shadow-sm">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Detalhes da Doação #{{ $doacao->id }}</h5>
-                    <a href="{{ url()->previous() ?: route('doacoes.index') }}" class="btn btn-secondary btn-sm">
+                    <a href="{{ route('doacoes.index') }}" class="btn btn-secondary btn-sm">
                         <i class="fa-solid fa-arrow-left"></i> Voltar
                     </a>
                 </div>
