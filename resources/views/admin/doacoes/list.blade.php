@@ -71,10 +71,6 @@
                                                     class="btn btn-outline-secondary btn-sm">
                                                     <i class="fa-solid fa-eye"></i> Ver
                                                 </a>
-                                                <a href="{{ route('doacoes.edit', $doacao->id) }}"
-                                                    class="btn btn-primary btn-sm">
-                                                    <i class="fa-solid fa-pen-to-square"></i> Editar
-                                                </a>
                                             </td>
                                         </tr>
                                     @empty
