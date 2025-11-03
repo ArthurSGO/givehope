@@ -4,7 +4,7 @@
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-11">
-                <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex justify-content-between align-itens-center mb-3">
                     <h2 class="h4 mb-0">Relatórios de Doações</h2>
                     <a href="{{ route('doacoes.index') }}" class="btn btn-secondary btn-sm">
                         <i class="fa-solid fa-arrow-left"></i> Voltar
@@ -57,7 +57,7 @@
                 @endphp
 
                 <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
+                    <div class="card-header d-flex justify-content-between align-itens-center">
                         <span>Doações recebidas</span>
                         <a href="{{ route('doacoes.relatorios.export', $queryExport) }}"
                             class="btn btn-outline-success btn-sm">

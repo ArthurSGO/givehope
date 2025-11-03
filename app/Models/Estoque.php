@@ -40,14 +40,14 @@ class Estoque extends Model
         return $this->hasMany(EstoqueMovimentacao::class);
     }
 
-    public function distribuicaoItems()
+    public function distribuicaoitens()
     {
         return $this->hasMany(DistribuicaoItem::class);
     }
 
     public function getQuantidadeReservadaAttribute(): float
     {
-        return (float) $this->distribuicaoItems()
+        return (float) $this->distribuicaoitens()
             ->whereHas('distribuicao', function ($query) {
                 $query->where('status', Distribuicao::STATUS_RESERVADO)
                     ->whereNull('estoque_debitado_em');

@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('items', function (Blueprint $table) {
+        Schema::create('itens', function (Blueprint $table) {
             $table->id();
             $table->string('nome')->unique(); // unique() para não ter itens duplicados
             $table->string('categoria')->nullable();
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('items');
+        Schema::dropIfExists('itens');
     }
 };

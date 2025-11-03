@@ -18,7 +18,7 @@
                     </div>
                     <div class="card-body">
 
-                        <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="d-flex justify-content-between align-itens-center mb-3">
                             <a href="{{ route('painel.dashboard') }}" class="btn btn-secondary">
                                 Voltar ao Painel
                             </a>
@@ -54,11 +54,11 @@
                                             <td>
                                                 @if($doacao->unidade == 'R$')
                                                     {{ $doacao->unidade }} {{ number_format($doacao->quantidade, 2, ',', '.') }}
-                                                @elseif ($doacao->items->count() > 1)
+                                                @elseif ($doacao->itens->count() > 1)
                                                     Múltiplos itens
-                                                @elseif ($doacao->items->count() == 1)
+                                                @elseif ($doacao->itens->count() == 1)
                                                     @php
-                                                        $item = $doacao->items->first();
+                                                        $item = $doacao->itens->first();
                                                     @endphp
                                                     {{ $item->pivot->quantidade }} {{ $item->pivot->unidade }}
                                                 @else
@@ -68,8 +68,12 @@
                                             <td>{{ $doacao->descricao ?? '-' }}</td>
                                             <td class="d-flex gap-2">
                                                 <a href="{{ route('doacoes.show', $doacao->id) }}"
-                                                    class="btn btn-outline-secondary btn-sm">
+                                                    class="btn btn-outline-success btn-sm">
                                                     <i class="fa-solid fa-eye"></i> Ver
+                                                </a>
+                                                <a href="{{ route('doacoes.edit', $doacao->id) }}"
+                                                    class="btn btn-outline-secondary btn-sm">
+                                                    <i class="fa-solid fa-eye"></i> Editar
                                                 </a>
                                             </td>
                                         </tr>

@@ -38,7 +38,7 @@ class PublicDonationLookupController extends Controller
                 $doador = Doador::where('cpf_cnpj', $cpfDigits)
                     ->with([
                         'doacoes' => function ($query) {
-                            $query->with(['items', 'paroquia'])
+                            $query->with(['itens', 'paroquia'])
                                 ->orderByDesc('data_doacao');
                         },
                     ])
@@ -96,13 +96,13 @@ class PublicDonationLookupController extends Controller
 
     private function prepararDoacoesParaExibicao(Collection $doacoes): Collection
     {
-        $doacoes->loadMissing(['items', 'paroquia']);
+        $doacoes->loadMissing(['itens', 'paroquia']);
 
         $chavesItens = [];
 
         foreach ($doacoes as $doacao) {
-            if ($doacao->tipo === 'item' && $doacao->items->isNotEmpty()) {
-                foreach ($doacao->items as $item) {
+            if ($doacao->tipo === 'item' && $doacao->itens->isNotEmpty()) {
+                foreach ($doacao->itens as $item) {
                     $chave = $this->gerarChaveEstoque($doacao->paroquia_id, $item->id, (string) $item->pivot->unidade);
                     $chavesItens[$chave] = [
                         'paroquia_id' => $doacao->paroquia_id,
@@ -206,12 +206,12 @@ class PublicDonationLookupController extends Controller
                 return $doacao;
             }
 
-            if ($doacao->tipo === 'item' && $doacao->items->isNotEmpty()) {
+            if ($doacao->tipo === 'item' && $doacao->itens->isNotEmpty()) {
                 $haReservas = false;
                 $haEnvios = false;
                 $haEntregas = false;
 
-                $doacao->detalhes_estoque = $doacao->items->map(function ($item) use ($doacao, $estoquesPorChave, $alocacoesDistribuicao, &$haReservas, &$haEnvios, &$haEntregas) {
+                $doacao->detalhes_estoque = $doacao->itens->map(function ($item) use ($doacao, $estoquesPorChave, $alocacoesDistribuicao, &$haReservas, &$haEnvios, &$haEntregas) {
                     $chave = $this->gerarChaveEstoque($doacao->paroquia_id, $item->id, (string) $item->pivot->unidade);
                     $alocacaoKey = $this->gerarChaveDoacaoItem($doacao->id, $item->id, (string) $item->pivot->unidade);
                     $alocacao = $alocacoesDistribuicao->get($alocacaoKey, [

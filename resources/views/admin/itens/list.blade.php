@@ -15,7 +15,7 @@
                     {{ __('Catálogo de Itens para Doação') }}
                 </div>
                 <div class="card-body">
-                    <a href="{{ route('items.create') }}" class="btn btn-success mb-3">
+                    <a href="{{ route('itens.create') }}" class="btn btn-success mb-3">
                         <i class="fa fa-plus"></i> Cadastrar Novo Item
                     </a>
                     <a href="{{ route('painel.dashboard') }}" class="btn btn-secondary mb-3">
@@ -32,19 +32,19 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($items as $item)
+                                @forelse ($itens as $item)
                                 <tr>
                                     <td>{{ $item->id }}</td>
                                     <td>{{ $item->nome }}</td>
                                     <td>{{ $item->categoria ?? 'Não informada' }}</td>
                                     <td>
-                                        <a href="{{ route('items.edit', $item->id) }}" class="btn btn-primary btn-sm m-1">
+                                        <a href="{{ route('itens.edit', $item->id) }}" class="btn btn-primary btn-sm m-1">
                                             <i class="fa-solid fa-pen-to-square"></i> Editar
                                         </a>
                                         <button type="button" class="btn btn-danger btn-sm m-1"
                                             data-bs-toggle="modal"
                                             data-bs-target="#confirmDeleteModal"
-                                            data-delete-url="{{ route('items.destroy', $item->id) }}">
+                                            data-delete-url="{{ route('itens.destroy', $item->id) }}">
                                             <i class="fa-solid fa-trash"></i> Excluir
                                         </button>
                                     </td>

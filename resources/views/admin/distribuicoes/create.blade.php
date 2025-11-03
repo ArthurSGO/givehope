@@ -78,14 +78,14 @@
                                             <td class="text-center fw-semibold">{{ $formatQuantidade($disponivel, $estoque->unidade) }}</td>
                                             <td>
                                                 <input type="number"
-                                                    name="items[{{ $estoque->id }}][quantidade]"
-                                                    class="form-control @error('items.' . $estoque->id . '.quantidade') is-invalid @enderror"
+                                                    name="itens[{{ $estoque->id }}][quantidade]"
+                                                    class="form-control @error('itens.' . $estoque->id . '.quantidade') is-invalid @enderror"
                                                     step="0.01"
                                                     min="0"
                                                     max="{{ $disponivel }}"
-                                                    value="{{ old('items.' . $estoque->id . '.quantidade') }}"
+                                                    value="{{ old('itens.' . $estoque->id . '.quantidade') }}"
                                                     @disabled($disponivel <= 0)>
-                                                @error('items.' . $estoque->id . '.quantidade')
+                                                @error('itens.' . $estoque->id . '.quantidade')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
                                             </td>

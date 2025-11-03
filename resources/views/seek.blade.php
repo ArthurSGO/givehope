@@ -11,7 +11,7 @@
 
         <div class="card shadow-sm mb-4 border-0">
             <div class="card-body p-4">
-                <form method="GET" action="{{ route('seek') }}" class="row g-3 align-items-end">
+                <form method="GET" action="{{ route('seek') }}" class="row g-3 align-itens-end">
                     <div class="col-md-8">
                         <label for="cpf" class="form-label">CPF ou CNPJ</label>
                         <input type="text" class="form-control @if($errorMessage) is-invalid @endif" id="cpf" name="cpf"
@@ -35,7 +35,7 @@
         @if($doador)
         <div class="card shadow-sm border-0 mb-4">
             <div class="card-body p-4">
-                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-itens-md-center">
                     <div>
                         <h2 class="h4 mb-1">{{ $doador->nome }}</h2>
                         <p class="mb-0 text-muted">CPF: {{ $doador->documento_formatado ?? 'Não informado' }}</p>
@@ -51,8 +51,8 @@
         @foreach($doacoes as $doacao)
         <div class="card shadow-sm border-0 mb-4">
             <div class="card-body p-4">
-                <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center mb-3">
-                    <div class="d-flex align-items-center">
+                <div class="d-flex flex-column flex-lg-row justify-content-between align-itens-lg-center mb-3">
+                    <div class="d-flex align-itens-center">
                         <span class="badge bg-{{ $doacao->status_badge }} me-2">{{ $doacao->status_distribuicao }}</span>
                         <span class="text-muted"><i class="fa-regular fa-calendar me-1"></i>{{ \Carbon\Carbon::parse($doacao->data_doacao)->format('d/m/Y') }}</span>
                     </div>

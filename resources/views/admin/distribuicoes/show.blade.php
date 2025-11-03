@@ -4,7 +4,7 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-10">
-            <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex justify-content-between align-itens-center mb-3">
                 <h2 class="h4 mb-0">Distribuição #{{ $distribuicao->id }}</h2>
                 <a href="{{ route('distribuicoes.index') }}" class="btn btn-secondary btn-sm">
                     <i class="fa-solid fa-arrow-left"></i> Voltar
@@ -86,7 +86,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($distribuicao->items as $item)
+                                @foreach ($distribuicao->itens as $item)
                                 <tr>
                                     <td>{{ $item->nome }}</td>
                                     <td>{{ $item->categoria ?? '-' }}</td>
@@ -106,7 +106,7 @@
                     <form action="{{ route('distribuicoes.update', $distribuicao) }}" method="POST">
                         @csrf
                         @method('PUT')
-                        <div class="row g-3 align-items-end">
+                        <div class="row g-3 align-itens-end">
                             <div class="col-md-4">
                                 <label for="status" class="form-label">Status</label>
                                 <select name="status" id="status" class="form-select @error('status') is-invalid @enderror">

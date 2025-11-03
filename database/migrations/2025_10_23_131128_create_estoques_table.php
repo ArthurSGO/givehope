@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('estoques', function (Blueprint $table) {
             $table->id();
             $table->foreignId('paroquia_id')->constrained('paroquias')->onDelete('cascade');
-            $table->foreignId('item_id')->constrained('items')->onDelete('cascade');
+            $table->foreignId('item_id')->constrained('itens')->onDelete('cascade');
             $table->enum('unidade', ['Unidade', 'Kg']);
             $table->decimal('quantidade', 12, 3);
             $table->timestamps();

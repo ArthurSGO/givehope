@@ -81,21 +81,21 @@
                         <div id="item-donation-section" style="display: none;">
                             <div class="card bg-light p-3">
                                 <h6 class="card-title">Adicionar Itens à Doação</h6>
-                                <div class="row g-3 align-items-end position-relative">
+                                <div class="row g-3 align-itens-end position-relative">
                                     <div class="col-md-6 position-relative">
                                         <label for="item_search" class="form-label">Buscar Item</label>
                                         <input type="text" id="item_search" class="form-control" placeholder="Digite para buscar..." autocomplete="off">
                                         <input type="hidden" id="selected_item_id">
                                         <div id="item_search_results" class="list-group shadow position-absolute w-100" style="z-index: 1050; display: none; top: 100%; left: 0; max-height: 220px; overflow-y: auto;"></div>
                                         <div id="selected-item-info" class="alert alert-info mt-2 py-2 px-3 d-none">
-                                            <div class="d-flex justify-content-between align-items-center">
+                                            <div class="d-flex justify-content-between align-itens-center">
                                                 <span id="selected-item-name" class="fw-semibold"></span>
                                                 <button type="button" class="btn btn-sm btn-link text-danger p-0" id="clear-selected-item">Remover</button>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="col-md-3 d-flex align-items-end">
+                                    <div class="col-md-3 d-flex align-itens-end">
                                         <button type="button" class="btn btn-outline-secondary w-100" id="toggle-new-item-btn">Cadastrar novo item</button>
                                     </div>
 
@@ -113,7 +113,7 @@
                                                     <option value="outro">Outro</option>
                                                 </select>
                                             </div>
-                                            <div class="col-md-2 d-flex align-items-end">
+                                            <div class="col-md-2 d-flex align-itens-end">
                                                 <button type="button" class="btn btn-link text-decoration-none text-danger px-0" id="cancel-new-item-btn">Cancelar</button>
                                             </div>
                                         </div>
@@ -226,7 +226,7 @@
 @endsection
 
 @push('scripts')
-<div id="preloaded-items-data" data-items='@json($itemsData)' class="d-none"></div>
+<div id="preloaded-itens-data" data-itens='@json($itensData)' class="d-none"></div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 
@@ -257,22 +257,22 @@
 
         const tipoSelect = document.getElementById('tipo');
         const moneySection = document.getElementById('money-donation-section');
-        const itemSection = document.getElementById('item-donation-section');
+        const itensection = document.getElementById('item-donation-section');
         const anonimaCheckbox = document.getElementById('doacao_anonima_checkbox');
         const anonimaCheckWrapper = anonimaCheckbox.closest('.form-check');
         const doadorSearchSection = document.getElementById('doador-search-section');
         const doadorIdInput = document.getElementById('doador_id');
         const submitButton = document.getElementById('submit-button');
         const itemOption = tipoSelect.querySelector('option[value="item"]');
-        const itemsData = @json($itemsData);
-        const itemSearchInput = document.getElementById('item_search');
-        const itemSearchResults = document.getElementById('item_search_results');
+        const itensData = @json($itensData);
+        const itensearchInput = document.getElementById('item_search');
+        const itensearchResults = document.getElementById('item_search_results');
         const selectedItemIdInput = document.getElementById('selected_item_id');
         const selectedItemInfo = document.getElementById('selected-item-info');
         const selectedItemName = document.getElementById('selected-item-name');
         const clearSelectedItemBtn = document.getElementById('clear-selected-item');
         const toggleNewItemBtn = document.getElementById('toggle-new-item-btn');
-        const newItemSection = document.getElementById('new-item-section');
+        const newitensection = document.getElementById('new-item-section');
         const newItemNameInput = document.getElementById('new_item_name');
         const newItemCategorySelect = document.getElementById('new_item_category');
         const cancelNewItemBtn = document.getElementById('cancel-new-item-btn');
@@ -326,7 +326,7 @@
         function toggleDonationSections() {
             const isDinheiro = tipoSelect.value === 'dinheiro';
             moneySection.style.display = isDinheiro ? 'block' : 'none';
-            itemSection.style.display = isDinheiro ? 'none' : 'block';
+            itensection.style.display = isDinheiro ? 'none' : 'block';
             anonimaCheckWrapper.style.display = isDinheiro ? 'block' : 'none';
 
             quantidadeDinheiroInput.required = isDinheiro;
@@ -389,8 +389,8 @@
         }
 
         function hideSearchResults() {
-            itemSearchResults.style.display = 'none';
-            itemSearchResults.innerHTML = '';
+            itensearchResults.style.display = 'none';
+            itensearchResults.innerHTML = '';
         }
 
         function renderSearchResults(query) {
@@ -400,14 +400,14 @@
                 return;
             }
 
-            const results = itemsData.filter(item => item.nome.toLowerCase().includes(normalizedQuery)).slice(0, 8);
-            itemSearchResults.innerHTML = '';
+            const results = itensData.filter(item => item.nome.toLowerCase().includes(normalizedQuery)).slice(0, 8);
+            itensearchResults.innerHTML = '';
 
             if (results.length === 0) {
                 const emptyItem = document.createElement('div');
                 emptyItem.className = 'list-group-item disabled';
                 emptyItem.textContent = 'Nenhum item encontrado.';
-                itemSearchResults.appendChild(emptyItem);
+                itensearchResults.appendChild(emptyItem);
             } else {
                 results.forEach(item => {
                     const button = document.createElement('button');
@@ -417,11 +417,11 @@
                     button.addEventListener('click', function() {
                         selectExistingItem(item);
                     });
-                    itemSearchResults.appendChild(button);
+                    itensearchResults.appendChild(button);
                 });
             }
 
-            itemSearchResults.style.display = 'block';
+            itensearchResults.style.display = 'block';
         }
 
         function clearSelectedItem() {
@@ -430,16 +430,16 @@
             selectedItemInfo.classList.add('d-none');
             selectedItemName.textContent = '';
             if (!creatingNewItem) {
-                itemSearchInput.value = '';
+                itensearchInput.value = '';
             }
             setUnitOptionsForCategory(null);
         }
 
-        function hideNewItemSection() {
+        function hideNewitensection() {
             creatingNewItem = false;
-            newItemSection.style.display = 'none';
+            newitensection.style.display = 'none';
             toggleNewItemBtn.textContent = 'Cadastrar novo item';
-            itemSearchInput.disabled = false;
+            itensearchInput.disabled = false;
             newItemNameInput.value = '';
             newItemCategorySelect.value = '';
             if (selectedItemIdInput.value === 'new') {
@@ -453,31 +453,31 @@
             if (!item) {
                 return;
             }
-            hideNewItemSection();
+            hideNewitensection();
             clearSelectedItem();
             selectedItemIdInput.value = item.id;
             selectedItemIdInput.dataset.category = item.categoria || '';
             selectedItemInfo.classList.remove('d-none');
             selectedItemName.textContent = item.nome;
-            itemSearchInput.value = item.nome;
+            itensearchInput.value = item.nome;
             setUnitOptionsForCategory(item.categoria || null);
             hideSearchResults();
         }
 
-        function showNewItemSection() {
+        function showNewitensection() {
             clearSelectedItem();
             hideSearchResults();
             creatingNewItem = true;
-            newItemSection.style.display = 'block';
+            newitensection.style.display = 'block';
             toggleNewItemBtn.textContent = 'Usar item existente';
-            itemSearchInput.disabled = true;
+            itensearchInput.disabled = true;
             selectedItemIdInput.value = 'new';
             setUnitOptionsForCategory(newItemCategorySelect.value || null);
             newItemNameInput.focus();
         }
 
-        if (itemSearchInput) {
-            itemSearchInput.addEventListener('input', function(event) {
+        if (itensearchInput) {
+            itensearchInput.addEventListener('input', function(event) {
                 if (creatingNewItem) {
                     return;
                 }
@@ -487,7 +487,7 @@
                 renderSearchResults(event.target.value);
             });
 
-            itemSearchInput.addEventListener('focus', function(event) {
+            itensearchInput.addEventListener('focus', function(event) {
                 if (!creatingNewItem && event.target.value.trim()) {
                     renderSearchResults(event.target.value);
                 }
@@ -495,7 +495,7 @@
         }
 
         document.addEventListener('click', function(event) {
-            if (!itemSearchResults.contains(event.target) && event.target !== itemSearchInput) {
+            if (!itensearchResults.contains(event.target) && event.target !== itensearchInput) {
                 hideSearchResults();
             }
         });
@@ -504,23 +504,23 @@
             clearSelectedItemBtn.addEventListener('click', function() {
                 clearSelectedItem();
                 hideSearchResults();
-                itemSearchInput.focus();
+                itensearchInput.focus();
             });
         }
 
         if (toggleNewItemBtn) {
             toggleNewItemBtn.addEventListener('click', function() {
                 if (creatingNewItem) {
-                    hideNewItemSection();
+                    hideNewitensection();
                 } else {
-                    showNewItemSection();
+                    showNewitensection();
                 }
             });
         }
 
         if (cancelNewItemBtn) {
             cancelNewItemBtn.addEventListener('click', function() {
-                hideNewItemSection();
+                hideNewitensection();
                 clearSelectedItem();
             });
         }
@@ -558,8 +558,8 @@
                 itemName = newItemName;
                 itemCategory = newItemCategory;
             } else if (itemId) {
-                const selectedItem = itemsData.find(item => String(item.id) === String(itemId));
-                itemName = selectedItem ? selectedItem.nome : itemSearchInput.value.trim();
+                const selectedItem = itensData.find(item => String(item.id) === String(itemId));
+                itemName = selectedItem ? selectedItem.nome : itensearchInput.value.trim();
                 itemCategory = selectedItem ? (selectedItem.categoria || '') : '';
             } else {
                 alert('Por favor, selecione um item ou cadastre um novo.');
@@ -581,7 +581,7 @@
             }
 
             const listItem = document.createElement('li');
-            listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+            listItem.className = 'list-group-item d-flex justify-content-between align-itens-center';
 
             const infoSpan = document.createElement('span');
             infoSpan.appendChild(document.createTextNode(`${itemName} - `));
@@ -604,18 +604,18 @@
             listItem.appendChild(removeButton);
 
             let hiddenInputs = '';
-            hiddenInputs += `<input type="hidden" name="items[${itemCounter}][item_id]" value="${sanitizeForAttribute(itemId)}">`;
-            hiddenInputs += `<input type="hidden" name="items[${itemCounter}][new_item_name]" value="${sanitizeForAttribute(isCreatingNewItem ? newItemName : '')}">`;
+            hiddenInputs += `<input type="hidden" name="itens[${itemCounter}][item_id]" value="${sanitizeForAttribute(itemId)}">`;
+            hiddenInputs += `<input type="hidden" name="itens[${itemCounter}][new_item_name]" value="${sanitizeForAttribute(isCreatingNewItem ? newItemName : '')}">`;
             if (isCreatingNewItem) {
-                hiddenInputs += `<input type="hidden" name="items[${itemCounter}][new_item_category]" value="${sanitizeForAttribute(newItemCategory)}">`;
+                hiddenInputs += `<input type="hidden" name="itens[${itemCounter}][new_item_category]" value="${sanitizeForAttribute(newItemCategory)}">`;
             }
-            hiddenInputs += `<input type="hidden" name="items[${itemCounter}][quantidade]" value="${sanitizeForAttribute(quantidade)}">`;
-            hiddenInputs += `<input type="hidden" name="items[${itemCounter}][unidade]" value="${sanitizeForAttribute(unidade)}">`;
+            hiddenInputs += `<input type="hidden" name="itens[${itemCounter}][quantidade]" value="${sanitizeForAttribute(quantidade)}">`;
+            hiddenInputs += `<input type="hidden" name="itens[${itemCounter}][unidade]" value="${sanitizeForAttribute(unidade)}">`;
             listItem.insertAdjacentHTML('beforeend', hiddenInputs);
 
             itemList.appendChild(listItem);
             if (isCreatingNewItem) {
-                hideNewItemSection();
+                hideNewitensection();
             } else {
                 clearSelectedItem();
             }

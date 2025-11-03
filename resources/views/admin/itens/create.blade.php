@@ -17,7 +17,7 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('items.store') }}" method="POST">
+                    <form action="{{ route('itens.store') }}" method="POST">
                         @csrf
                         <div class="mb-3">
                             <label for="nome" class="form-label">Nome do Item</label>
@@ -33,7 +33,7 @@
 
                         <div class="mt-4">
                             <button type="submit" class="btn btn-primary">Cadastrar Item</button>
-                            <a href="{{ route('items.index') }}" class="btn btn-secondary">Cancelar</a>
+                            <a href="{{ route('itens.index') }}" class="btn btn-secondary">Cancelar</a>
                         </div>
                     </form>
                 </div>

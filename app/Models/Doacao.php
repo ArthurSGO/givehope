@@ -50,21 +50,21 @@ class Doacao extends Model
             ->dontSubmitEmptyLogs();
     }
 
-    public function items()
+    public function itens()
     {
         return $this->belongsToMany(Item::class, 'doacao_item')
-            ->withPivot('quantidade', 'unidade')
+            ->withPivot(['quantidade', 'unidade'])
             ->withTimestamps();
     }
-    
-public function distribuicoes()
-{
-    return $this->belongsToMany(
-        Distribuicao::class,
-        'distribuicao_item',
-        'item_id',
-        'distribuicao_id'
-    )->withTimestamps();
-}
+
+    public function distribuicoes()
+    {
+        return $this->belongsToMany(
+            Distribuicao::class,
+            'distribuicao_item',
+            'item_id',
+            'distribuicao_id'
+        )->withTimestamps();
+    }
 
 }

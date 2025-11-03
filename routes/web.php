@@ -23,7 +23,7 @@ Route::middleware(['auth', 'is_admin'])->group(function () {
 });
 
 Route::middleware(['auth'])->group(function () {
-    Route::resource('items', ItemController::class);
+    Route::resource('itens', ItemController::class);
     Route::get('doacoes/relatorios', [DoacaoController::class, 'report'])->name('doacoes.relatorios');
     Route::get('doacoes/relatorios/export', [DoacaoController::class, 'exportCsv'])->name('doacoes.relatorios.export');
     Route::resource('doacoes', DoacaoController::class)->parameters(['doacoes' => 'doacao']);

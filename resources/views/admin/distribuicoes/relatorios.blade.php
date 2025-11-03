@@ -4,7 +4,7 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-11">
-            <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex justify-content-between align-itens-center mb-3">
                 <h2 class="h4 mb-0">Relatórios de Distribuição</h2>
                 <a href="{{ route('distribuicoes.index') }}" class="btn btn-secondary btn-sm">
                     <i class="fa-solid fa-arrow-left"></i> Voltar
@@ -27,7 +27,7 @@
                             <label for="item_id" class="form-label">Item</label>
                             <select name="item_id" id="item_id" class="form-select">
                                 <option value="">Todos</option>
-                                @foreach ($items as $item)
+                                @foreach ($itens as $item)
                                 <option value="{{ $item->id }}" @selected(($filtros['item_id'] ?? null) == $item->id)>{{ $item->nome }}</option>
                                 @endforeach
                             </select>
@@ -64,7 +64,7 @@
             @endphp
 
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header d-flex justify-content-between align-itens-center">
                     <span>Resumo das distribuições</span>
                     <a href="{{ route('distribuicoes.relatorios.export', $queryExport) }}" class="btn btn-outline-success btn-sm">
                         <i class="fa-solid fa-file-csv me-1"></i> Exportar CSV

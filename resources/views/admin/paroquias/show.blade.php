@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="card-header d-flex justify-content-between align-itens-center">
             <h5 class="mb-0">Detalhes da Paróquia: {{ $paroquia->nome_fantasia ?? $paroquia->nome }}</h5>
             <a href="{{ route('paroquias.index') }}" class="btn btn-secondary btn-sm">
                 <i class="fa-solid fa-arrow-left"></i> Voltar para a Lista

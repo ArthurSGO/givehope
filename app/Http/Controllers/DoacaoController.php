@@ -12,9 +12,14 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Spatie\Activitylog\Models\Activity;
+// Adiciona a classe de Exceção de Validação
+use Illuminate\Validation\ValidationException;
 
 class DoacaoController extends Controller
 {
+    // --- index, create, store ---
+    // (Seus métodos index, create e store permanecem como estão)
+    // ...
     public function index()
     {
         $user = Auth::user();
@@ -29,8 +34,8 @@ class DoacaoController extends Controller
     public function create()
     {
         $doadores = Doador::all();
-        $items = Item::orderBy('nome')->get();
-        $itemsData = $items->map(function ($item) {
+        $itens = Item::orderBy('nome')->get();
+        $itensData = $itens->map(function ($item) {
             return [
                 'id' => $item->id,
                 'nome' => $item->nome,
@@ -38,7 +43,7 @@ class DoacaoController extends Controller
             ];
         })->values();
 
-        return view('admin.doacoes.create', compact('doadores', 'items', 'itemsData'));
+        return view('admin.doacoes.create', compact('doadores', 'itens', 'itensData'));
     }
 
     public function store(Request $request)
@@ -95,46 +100,46 @@ class DoacaoController extends Controller
             });
         } elseif ($request->tipo == 'item') {
             $request->validate([
-                'items' => 'required|array|min:1',
-                'items.*.quantidade' => 'required|numeric|min:0.01',
-                'items.*.unidade' => 'required|in:Unidade,Kg',
-                'items.*.item_id' => 'required',
-                'items.*.new_item_name' => 'nullable|required_if:items.*.item_id,new|string|max:255',
-                'items.*.new_item_category' => 'sometimes|nullable|required_if:items.*.item_id,new|in:alimento,outro',
+                'itens' => 'required|array|min:1',
+                'itens.*.quantidade' => 'required|numeric|min:0.01',
+                'itens.*.unidade' => 'required|in:Unidade,Kg',
+                'itens.*.item_id' => 'required',
+                'itens.*.new_item_name' => 'nullable|required_if:itens.*.item_id,new|string|max:255',
+                'itens.*.new_item_category' => 'sometimes|nullable|required_if:itens.*.item_id,new|in:alimento,outro',
             ], [
-                'items.required' => 'Adicione pelo menos um item à doação.',
-                'items.min' => 'Adicione pelo menos um item à doação.',
-                'items.*.new_item_name.required_if' => 'O nome do novo item é obrigatório.',
-                'items.*.new_item_category.required_if' => 'A categoria do novo item é obrigatória.',
-                'items.*.new_item_category.in' => 'Selecione uma categoria válida para o item.',
+                'itens.required' => 'Adicione pelo menos um item à doação.',
+                'itens.min' => 'Adicione pelo menos um item à doação.',
+                'itens.*.new_item_name.required_if' => 'O nome do novo item é obrigatório.',
+                'itens.*.new_item_category.required_if' => 'A categoria do novo item é obrigatória.',
+                'itens.*.new_item_category.in' => 'Selecione uma categoria válida para o item.',
             ]);
 
             $doacao->quantidade = null;
             $doacao->unidade = null;
-            $doacao->save();
+            // $doacao->save(); // Salva só dentro da transação
 
-            $itemsCollection = collect($request->input('items', []));
-            $existingItemIds = $itemsCollection
+            $itensCollection = collect($request->input('itens', []));
+            $existingItemIds = $itensCollection
                 ->pluck('item_id')
                 ->filter(fn($id) => is_numeric($id))
                 ->map(fn($id) => (int) $id)
                 ->unique()
                 ->values();
 
-            $existingItems = Item::whereIn('id', $existingItemIds)->get()->keyBy('id');
+            $existingitens = Item::whereIn('id', $existingItemIds)->get()->keyBy('id');
 
             $unitErrors = [];
-            foreach ($itemsCollection as $index => $itemData) {
+            foreach ($itensCollection as $index => $itemData) {
                 $unidade = $itemData['unidade'] ?? null;
                 if (($itemData['item_id'] ?? null) === 'new') {
                     $category = $itemData['new_item_category'] ?? null;
                     if ($category === 'alimento' && $unidade !== 'Kg') {
-                        $unitErrors["items.$index.unidade"] = 'Itens da categoria "Alimento" devem ser cadastrados em Kg.';
+                        $unitErrors["itens.$index.unidade"] = 'Itens da categoria "Alimento" devem ser cadastrados em Kg.';
                     }
                 } elseif (is_numeric($itemData['item_id'])) {
-                    $existingItem = $existingItems->get((int) $itemData['item_id']);
+                    $existingItem = $existingitens->get((int) $itemData['item_id']);
                     if ($existingItem && $existingItem->categoria === 'alimento' && $unidade !== 'Kg') {
-                        $unitErrors["items.$index.unidade"] = 'Itens da categoria "Alimento" devem ser cadastrados em Kg.';
+                        $unitErrors["itens.$index.unidade"] = 'Itens da categoria "Alimento" devem ser cadastrados em Kg.';
                     }
                 }
             }
@@ -143,8 +148,8 @@ class DoacaoController extends Controller
                 return back()->withErrors($unitErrors)->withInput();
             }
 
-            $itemsToAttach = [];
-            foreach ($request->items as $itemData) {
+            $itensToAttach = [];
+            foreach ($request->itens as $itemData) {
                 $itemId = null;
                 if ($itemData['item_id'] == 'new' && !empty($itemData['new_item_name'])) {
                     $itemName = trim($itemData['new_item_name']);
@@ -162,22 +167,22 @@ class DoacaoController extends Controller
                 }
 
                 if ($itemId) {
-                    $itemsToAttach[$itemId] = [
+                    $itensToAttach[$itemId] = [
                         'quantidade' => round((float) $itemData['quantidade'], 3),
                         'unidade' => $itemData['unidade']
                     ];
                 }
             }
 
-            if (!empty($itemsToAttach)) {
-                DB::transaction(function () use ($doacao, $itemsToAttach, $paroquiaId, $userId) {
+            if (!empty($itensToAttach)) {
+                DB::transaction(function () use ($doacao, $itensToAttach, $paroquiaId, $userId) {
                     $doacao->quantidade = null;
                     $doacao->unidade = null;
-                    $doacao->save();
+                    $doacao->save(); // Agora salva a doação
 
-                    $doacao->items()->attach($itemsToAttach);
+                    $doacao->itens()->attach($itensToAttach);
 
-                    foreach ($itemsToAttach as $itemId => $itemData) {
+                    foreach ($itensToAttach as $itemId => $itemData) {
                         $estoque = Estoque::firstOrNew([
                             'paroquia_id' => $paroquiaId,
                             'item_id' => $itemId,
@@ -201,7 +206,7 @@ class DoacaoController extends Controller
                     }
                 });
             } else {
-                return back()->withErrors(['items' => 'Não foi possível processar os itens. Verifique os dados.'])->withInput();
+                return back()->withErrors(['itens' => 'Não foi possível processar os itens. Verifique os dados.'])->withInput();
             }
         } else {
             return back()->withErrors(['tipo' => 'Tipo de doação inválido.'])->withInput();
@@ -209,12 +214,13 @@ class DoacaoController extends Controller
 
         return redirect()->route('doacoes.index')->with('success', 'Doação registrada com sucesso!');
     }
+    // --- Fim index, create, store ---
 
     public function show($id)
     {
         $user = Auth::user();
 
-        $doacaoQuery = Doacao::with(['doador', 'items']);
+        $doacaoQuery = Doacao::with(['doador', 'itens']);
 
         if (!$user->is_admin) {
             $doacaoQuery->where('paroquia_id', $user->paroquia_id);
@@ -236,14 +242,14 @@ class DoacaoController extends Controller
                 return $formatado;
             };
 
-            $doacao->items->each(function ($item) use ($formatarQuantidade) {
+            $doacao->itens->each(function ($item) use ($formatarQuantidade) {
                 $item->formatted_quantidade = $formatarQuantidade(
                     (float) $item->pivot->quantidade,
                     $item->pivot->unidade
                 );
             });
 
-            $resumoItens = $doacao->items
+            $resumoItens = $doacao->itens
                 ->groupBy(fn($item) => $item->pivot->unidade)
                 ->mapWithKeys(function ($grupo, $unidade) use ($formatarQuantidade) {
                     $total = $grupo->sum(fn($item) => (float) $item->pivot->quantidade);
@@ -263,19 +269,220 @@ class DoacaoController extends Controller
         return view('admin.doacoes.show', compact('doacao', 'logs'));
     }
 
-    public function edit(Doacao $doacao)
+    public function edit($id)
     {
-        //
+        $doacao = Doacao::with(['doador', 'itens'])->findOrFail($id);
+        $itens = Item::select('id', 'nome', 'categoria')->orderBy('nome')->get();
+        if ($doacao->tipo !== 'item') {
+            return redirect()->route('doacoes.show', $id)->with('error', 'Edição disponível apenas para doações de item.');
+        }
+        return view('admin.doacoes.edit', [
+            'doacao' => $doacao,
+            'itens' => $itens,
+        ]);
     }
 
-    public function update(Request $request, Doacao $doacao)
+    public function update(Request $request, $id)
     {
-        //
+        $doacao = Doacao::with(['itens'])->findOrFail($id);
+        if ($doacao->tipo !== 'item') {
+            return redirect()->route('doacoes.show', $id)->with('error', 'Edição disponível apenas para doações de item.');
+        }
+
+        $dados = $request->validate([
+            'itens' => ['array'],
+            'itens.*.item_id' => ['nullable'],
+            'itens.*.new_item_name' => ['nullable', 'string', 'max:255'],
+            'itens.*.new_item_category' => ['nullable', 'in:alimento,outro'],
+            'itens.*.quantidade' => ['required', 'numeric', 'gt:0'],
+            'itens.*.unidade' => ['required', 'in:Kg,Unidade'],
+        ]);
+
+        $sync = [];
+        $itensReq = collect($dados['itens'] ?? []);
+
+        foreach ($itensReq as $row) {
+            $isNew = isset($row['item_id']) && $row['item_id'] === 'new';
+            if ($isNew) {
+                if (empty($row['new_item_name']) || empty($row['new_item_category'])) {
+                    return back()->withErrors(['itens' => 'Dados do novo item incompletos.'])->withInput();
+                }
+                if ($row['new_item_category'] === 'alimento' && $row['unidade'] !== 'Kg') {
+                    return back()->withErrors(['itens' => 'Itens da categoria Alimento devem usar unidade Kg.'])->withInput();
+                }
+                $novo = \App\Models\Item::firstOrCreate(
+                    ['nome' => $row['new_item_name']],
+                    ['categoria' => $row['new_item_category']]
+                );
+                $itemId = $novo->id;
+                $categoria = $row['new_item_category'];
+            } else {
+                if (empty($row['item_id'])) {
+                    return back()->withErrors(['itens' => 'Item inválido.'])->withInput();
+                }
+                $item = \App\Models\Item::select('id', 'categoria')->findOrFail($row['item_id']);
+                $itemId = $item->id;
+                $categoria = $item->categoria ?? 'outro';
+                if ($categoria === 'alimento' && $row['unidade'] !== 'Kg') {
+                    return back()->withErrors(['itens' => 'Itens da categoria Alimento devem usar unidade Kg.'])->withInput();
+                }
+            }
+
+            $sync[$itemId] = [
+                'quantidade' => $row['quantidade'],
+                'unidade' => $row['unidade'],
+            ];
+        }
+
+        DB::transaction(function () use ($doacao, $sync) {
+            $paroquiaId = $doacao->paroquia_id;
+            $userId = Auth::id();
+
+            $antes = $doacao->itens->mapWithKeys(function ($item) {
+                $k = $item->id . '|' . $item->pivot->unidade;
+                return [$k => (float) $item->pivot->quantidade];
+            });
+
+            $doacao->itens()->sync($sync);
+
+            $depois = $doacao->itens()->get()->mapWithKeys(function ($item) {
+                $k = $item->id . '|' . $item->pivot->unidade;
+                return [$k => (float) $item->pivot->quantidade];
+            });
+
+            $chaves = $antes->keys()->merge($depois->keys())->unique();
+
+            $idsParaNomes = $chaves->map(function ($k) {
+                [$itemId, $u] = explode('|', $k);
+                return (int) $itemId;
+            })->unique()->values();
+
+            $nomes = \App\Models\Item::whereIn('id', $idsParaNomes)->pluck('nome', 'id');
+
+            $alteracoes = [];
+
+            foreach ($chaves as $k) {
+                [$itemId, $unidade] = explode('|', $k);
+                $old = (float) ($antes[$k] ?? 0);
+                $new = (float) ($depois[$k] ?? 0);
+                $delta = round($new - $old, 3);
+                if ($delta == 0.0) {
+                    continue;
+                }
+
+                $estoque = Estoque::firstOrNew([
+                    'paroquia_id' => $paroquiaId,
+                    'item_id' => (int) $itemId,
+                    'unidade' => $unidade,
+                ]);
+
+                $estoque->quantidade = round((float) ($estoque->quantidade ?? 0) + $delta, 3);
+                $estoque->save();
+
+                EstoqueMovimentacao::create([
+                    'estoque_id' => $estoque->id,
+                    'paroquia_id' => $paroquiaId,
+                    'item_id' => (int) $itemId,
+                    'doacao_id' => $doacao->id,
+                    'user_id' => $userId,
+                    'tipo' => $delta > 0 ? 'entrada' : 'saida',
+                    'quantidade' => abs($delta),
+                    'unidade' => $unidade,
+                    'motivo' => 'Ajuste de Doação (ID: ' . $doacao->id . ')',
+                ]);
+
+                $acao = $old == 0 && $new > 0 ? 'adicionado' : ($new == 0 && $old > 0 ? 'removido' : 'alterado');
+
+                $alteracoes[] = [
+                    'item_id' => (int) $itemId,
+                    'nome' => (string) ($nomes[(int) $itemId] ?? ''),
+                    'unidade' => $unidade,
+                    'anterior' => $old,
+                    'atual' => $new,
+                    'delta' => $delta,
+                    'acao' => $acao,
+                ];
+            }
+
+            $propsChanges = [
+                'old' => ['itens' => $antes->toArray()],
+                'attributes' => ['itens' => $depois->toArray()],
+                'extra' => ['alteracoes' => array_values($alteracoes)],
+            ];
+
+            if (!empty($alteracoes)) {
+                activity()->useLog('Doações')
+                    ->event('updated')
+                    ->performedOn($doacao)
+                    ->causedBy(Auth::user())
+                    ->withProperties($propsChanges)
+                    ->log('Doação editada');
+            } else {
+                activity()->useLog('Doações')
+                    ->event('updated')
+                    ->performedOn($doacao)
+                    ->causedBy(Auth::user())
+                    ->withProperties($propsChanges)
+                    ->log('Doação editada sem alteração de itens');
+            }
+        });
+
+        return redirect()->route('doacoes.show', $doacao->id)->with('success', 'Doação atualizada com sucesso.');
     }
 
-    public function destroy($id)
+    public function destroy(Doacao $doacao)
     {
-        //
+        $user = Auth::user();
+        if (!$user->is_admin && $doacao->paroquia_id != $user->paroquia_id) {
+            abort(403, 'Acesso não autorizado.');
+        }
+
+        try {
+            DB::transaction(function () use ($doacao, $user) {
+                $paroquiaId = $doacao->paroquia_id;
+                $userId = $user->id;
+
+                if ($doacao->tipo == 'item') {
+                    $itens = $doacao->itens()->get();
+                    if ($itens->count() > 0) {
+                        foreach ($itens as $item) {
+                            $estoque = Estoque::firstOrCreate(
+                                [
+                                    'paroquia_id' => $paroquiaId,
+                                    'item_id' => $item->id,
+                                    'unidade' => $item->pivot->unidade,
+                                ]
+                            );
+
+                            $estoque->quantidade = round(floatval($estoque->quantidade) - floatval($item->pivot->quantidade), 3);
+                            $estoque->save();
+
+                            EstoqueMovimentacao::create([
+                                'estoque_id' => $estoque->id,
+                                'paroquia_id' => $paroquiaId,
+                                'item_id' => $item->id,
+                                'doacao_id' => $doacao->id,
+                                'user_id' => $userId,
+                                'tipo' => 'saida',
+                                'quantidade' => $item->pivot->quantidade,
+                                'unidade' => $item->pivot->unidade,
+                                'motivo' => 'Exclusão de Doação (ID: ' . $doacao->id . ')',
+                            ]);
+                        }
+
+                        $doacao->itens()->detach();
+                    }
+                }
+
+                $doacao->delete();
+
+            });
+
+        } catch (\Exception $e) {
+            return redirect()->route('doacoes.index')->with('error', 'Erro ao excluir a doação: ' . $e->getMessage());
+        }
+
+        return redirect()->route('doacoes.index')->with('success', 'Doação excluída com sucesso!');
     }
 
     public function report(Request $request)

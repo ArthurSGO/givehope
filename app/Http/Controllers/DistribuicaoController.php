@@ -25,7 +25,7 @@ class DistribuicaoController extends Controller
     {
         $user = Auth::user();
 
-        $distribuicoes = Distribuicao::with(['beneficiario', 'items'])
+        $distribuicoes = Distribuicao::with(['beneficiario', 'itens'])
             ->where('paroquia_id', $user->paroquia_id)
             ->latest()
             ->paginate(15);
@@ -38,7 +38,7 @@ class DistribuicaoController extends Controller
         $user = Auth::user();
 
         $beneficiarios = Beneficiario::orderBy('nome')->get();
-        $estoques = Estoque::with(['item', 'distribuicaoItems.distribuicao'])
+        $estoques = Estoque::with(['item', 'distribuicaoitens.distribuicao'])
             ->where('paroquia_id', $user->paroquia_id)
             ->orderBy('item_id')
             ->orderBy('unidade')
@@ -56,10 +56,10 @@ class DistribuicaoController extends Controller
         $validated = $request->validate([
             'beneficiario_id' => ['required', 'exists:beneficiarios,id'],
             'observacoes' => ['nullable', 'string'],
-            'items' => ['nullable', 'array'],
+            'itens' => ['nullable', 'array'],
         ]);
 
-        $itensSelecionados = $this->extrairItensDaRequisicao($request->input('items', []));
+        $itensSelecionados = $this->extrairItensDaRequisicao($request->input('itens', []));
 
         $distribuicao = null;
 
@@ -84,7 +84,7 @@ class DistribuicaoController extends Controller
 
                 if (!$estoque) {
                     throw ValidationException::withMessages([
-                        'items' => 'Um dos itens selecionados não está disponível no estoque da paróquia.',
+                        'itens' => 'Um dos itens selecionados não está disponível no estoque da paróquia.',
                     ]);
                 }
 
@@ -92,7 +92,7 @@ class DistribuicaoController extends Controller
 
                 if ($disponivel < $item['quantidade']) {
                     throw ValidationException::withMessages([
-                        "items.{$estoque->id}.quantidade" => sprintf(
+                        "itens.{$estoque->id}.quantidade" => sprintf(
                             'Quantidade solicitada (%.2f %s) excede o disponível (%.2f %s).',
                             $item['quantidade'],
                             $estoque->unidade,
@@ -113,14 +113,14 @@ class DistribuicaoController extends Controller
             }
         });
 
-        $distribuicao->load('items', 'beneficiario');
+        $distribuicao->load('itens', 'beneficiario');
 
         activity('Distribuições')
             ->performedOn($distribuicao)
             ->causedBy($user)
             ->withProperties([
                 'status' => $distribuicao->status,
-                'itens' => $distribuicao->items->map(function (Item $item) {
+                'itens' => $distribuicao->itens->map(function (Item $item) {
                     return [
                         'item_id' => $item->id,
                         'nome' => $item->nome,
@@ -140,7 +140,7 @@ class DistribuicaoController extends Controller
         $user = Auth::user();
         $this->garantirParoquia($distribuicao, $user->paroquia_id);
 
-        $distribuicao->load(['beneficiario', 'items']);
+        $distribuicao->load(['beneficiario', 'itens']);
 
         $statusDisponiveis = $this->statusDisponiveis($distribuicao);
 
@@ -197,7 +197,7 @@ class DistribuicaoController extends Controller
             $distribuicao->save();
         });
 
-        $distribuicao->refresh()->load('items', 'beneficiario');
+        $distribuicao->refresh()->load('itens', 'beneficiario');
 
         if ($statusAtual !== $novoStatus) {
             $mensagem = $novoStatus === Distribuicao::STATUS_ENTREGUE
@@ -211,7 +211,7 @@ class DistribuicaoController extends Controller
                 ->causedBy($user)
                 ->withProperties([
                     'status' => $novoStatus,
-                    'itens' => $distribuicao->items->map(function (Item $item) {
+                    'itens' => $distribuicao->itens->map(function (Item $item) {
                         return [
                             'item_id' => $item->id,
                             'nome' => $item->nome,
@@ -233,18 +233,18 @@ class DistribuicaoController extends Controller
         $filtros = $request->validate([
             'data_inicio' => ['nullable', 'date'],
             'data_fim' => ['nullable', 'date', 'after_or_equal:data_inicio'],
-            'item_id' => ['nullable', 'exists:items,id'],
+            'item_id' => ['nullable', 'exists:itens,id'],
             'beneficiario_id' => ['nullable', 'exists:beneficiarios,id'],
         ]);
 
         $dadosRelatorio = $this->montarConsultaRelatorio($filtros, $user->paroquia_id)->get();
 
-        $items = Item::orderBy('nome')->get();
+        $itens = Item::orderBy('nome')->get();
         $beneficiarios = Beneficiario::orderBy('nome')->get();
 
         return view('admin.distribuicoes.relatorios', [
             'dadosRelatorio' => $dadosRelatorio,
-            'items' => $items,
+            'itens' => $itens,
             'beneficiarios' => $beneficiarios,
             'filtros' => $filtros,
         ]);
@@ -256,13 +256,13 @@ class DistribuicaoController extends Controller
         $filtros = $request->validate([
             'data_inicio' => ['nullable', 'date'],
             'data_fim' => ['nullable', 'date', 'after_or_equal:data_inicio'],
-            'item_id' => ['nullable', 'exists:items,id'],
+            'item_id' => ['nullable', 'exists:itens,id'],
             'beneficiario_id' => ['nullable', 'exists:beneficiarios,id'],
         ]);
 
         $linhas = $this->montarConsultaRelatorio($filtros, $user->paroquia_id)
             ->orderBy('beneficiarios.nome')
-            ->orderBy('items.nome')
+            ->orderBy('itens.nome')
             ->get();
 
         $nomeArquivo = 'relatorio-distribuicoes-' . now()->format('Ymd_His') . '.csv';
@@ -289,9 +289,9 @@ class DistribuicaoController extends Controller
 
     protected function debitarEstoque(Distribuicao $distribuicao, User $user, string $status): void
     {
-        $distribuicao->loadMissing('items');
+        $distribuicao->loadMissing('itens');
 
-        foreach ($distribuicao->items as $item) {
+        foreach ($distribuicao->itens as $item) {
             $pivot = $item->pivot;
 
             $estoque = Estoque::where('id', $pivot->estoque_id)
@@ -301,13 +301,13 @@ class DistribuicaoController extends Controller
 
             if (!$estoque) {
                 throw ValidationException::withMessages([
-                    'items' => 'Não foi possível localizar o estoque vinculado a esta distribuição.',
+                    'itens' => 'Não foi possível localizar o estoque vinculado a esta distribuição.',
                 ]);
             }
 
             if ($pivot->quantidade_reservada > $estoque->quantidade) {
                 throw ValidationException::withMessages([
-                    'items' => sprintf(
+                    'itens' => sprintf(
                         'O estoque disponível para %s é insuficiente para concluir a distribuição.',
                         $item->nome
                     ),
@@ -375,12 +375,12 @@ class DistribuicaoController extends Controller
         };
     }
 
-    protected function extrairItensDaRequisicao(array $items): Collection
+    protected function extrairItensDaRequisicao(array $itens): Collection
     {
         $itensFormatados = collect();
         $erros = [];
 
-        foreach ($items as $estoqueId => $dados) {
+        foreach ($itens as $estoqueId => $dados) {
             $quantidade = Arr::get($dados, 'quantidade');
 
             if ($quantidade === null || $quantidade === '') {
@@ -388,7 +388,7 @@ class DistribuicaoController extends Controller
             }
 
             if (!is_numeric($quantidade) || (float) $quantidade <= 0) {
-                $erros["items.{$estoqueId}.quantidade"] = 'Informe uma quantidade válida para o item selecionado.';
+                $erros["itens.{$estoqueId}.quantidade"] = 'Informe uma quantidade válida para o item selecionado.';
                 continue;
             }
 
@@ -399,7 +399,7 @@ class DistribuicaoController extends Controller
         }
 
         if ($itensFormatados->isEmpty()) {
-            $erros['items'] = 'Selecione ao menos um item para distribuir.';
+            $erros['itens'] = 'Selecione ao menos um item para distribuir.';
         }
 
         if (!empty($erros)) {
@@ -413,11 +413,11 @@ class DistribuicaoController extends Controller
     {
         $query = DistribuicaoItem::query()
             ->selectRaw(
-                'beneficiarios.nome as beneficiario_nome, items.nome as item_nome, distribuicao_item.unidade, ' .
+                'beneficiarios.nome as beneficiario_nome, itens.nome as item_nome, distribuicao_item.unidade, ' .
                 'SUM(distribuicao_item.quantidade) as total_quantidade, COUNT(DISTINCT distribuicoes.id) as total_distribuicoes'
             )
             ->join('distribuicoes', 'distribuicao_item.distribuicao_id', '=', 'distribuicoes.id')
-            ->join('items', 'distribuicao_item.item_id', '=', 'items.id')
+            ->join('itens', 'distribuicao_item.item_id', '=', 'itens.id')
             ->join('beneficiarios', 'distribuicoes.beneficiario_id', '=', 'beneficiarios.id')
             ->where('distribuicoes.paroquia_id', $paroquiaId)
             ->whereNotNull('distribuicoes.estoque_debitado_em')
@@ -443,11 +443,11 @@ class DistribuicaoController extends Controller
         }
 
         $query->orderBy('beneficiarios.nome')
-            ->orderBy('items.nome');
+            ->orderBy('itens.nome');
 
         return $query->groupBy(
             'beneficiarios.nome',
-            'items.nome',
+            'itens.nome',
             'distribuicao_item.unidade',
             'distribuicoes.beneficiario_id',
             'distribuicao_item.item_id'

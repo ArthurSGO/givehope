@@ -15,7 +15,7 @@ class LogController extends Controller
             'causer:id,name',
             'subject' => function (MorphTo $morphTo) {
                 $morphTo->morphWith([
-                    Doacao::class => ['doador:id,nome', 'items:id,nome'],
+                    Doacao::class => ['doador:id,nome', 'itens:id,nome'],
                 ]);
             },
         ])
@@ -42,7 +42,7 @@ class LogController extends Controller
             'causer:id,name',
             'subject' => function (MorphTo $morphTo) {
                 $morphTo->morphWith([
-                    Doacao::class => ['doador:id,nome', 'items:id,nome'],
+                    Doacao::class => ['doador:id,nome', 'itens:id,nome'],
                 ]);
             },
         ])

@@ -13,7 +13,7 @@
             @endif
 
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header d-flex justify-content-between align-itens-center">
                     <span>{{ __('Distribuições da Paróquia') }}</span>
                     <div class="d-flex gap-2">
                         <a href="{{ route('painel.dashboard') }}" class="btn btn-secondary btn-sm">
@@ -72,7 +72,7 @@
                                     </td>
                                     <td>
                                         <ul class="list-unstyled mb-0">
-                                            @foreach ($distribuicao->items as $item)
+                                            @foreach ($distribuicao->itens as $item)
                                             <li>{{ $item->nome }} - {{ $formatQuantidade($item->pivot->quantidade, $item->pivot->unidade) }} {{ $item->pivot->unidade }}</li>
                                             @endforeach
                                         </ul>

@@ -4,7 +4,7 @@
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-11">
-            <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex justify-content-between align-itens-center mb-3">
                 <h2 class="h4 mb-0">
                     Extrato de Movimentações
                 </h2>

@@ -9,25 +9,25 @@ class ItemController extends Controller
 {
     public function index()
     {
-        $items = Item::orderBy('nome')->get();
-        return view('admin.items.list', compact('items'));
+        $itens = Item::orderBy('nome')->get();
+        return view('admin.itens.list', compact('itens'));
     }
 
     public function create()
     {
-        return view('admin.items.create');
+        return view('admin.itens.create');
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'nome' => 'required|string|max:255|unique:items,nome',
+            'nome' => 'required|string|max:255|unique:itens,nome',
             'categoria' => 'nullable|string|max:255',
         ]);
 
         Item::create($request->all());
 
-        return redirect()->route('items.index')->with('success', 'Item cadastrado com sucesso!');
+        return redirect()->route('itens.index')->with('success', 'Item cadastrado com sucesso!');
     }
 
     public function show($id)
@@ -37,24 +37,24 @@ class ItemController extends Controller
 
     public function edit($id)
     {
-        return view('admin.items.edit', compact('item'));
+        return view('admin.itens.edit', compact('item'));
     }
 
     public function update(Request $request, Item $item)
     {
         $request->validate([
-            'nome' => 'required|string|max:255|unique:items,nome,' . $item->id,
+            'nome' => 'required|string|max:255|unique:itens,nome,' . $item->id,
             'categoria' => 'nullable|string|max:255',
         ]);
 
         $item->update($request->all());
 
-        return redirect()->route('items.index')->with('success', 'Item atualizado com sucesso!');
+        return redirect()->route('itens.index')->with('success', 'Item atualizado com sucesso!');
     }
 
     public function destroy(Item $item)
     {
         $item->delete();
-        return redirect()->route('items.index')->with('success', 'Item excluído com sucesso!');
+        return redirect()->route('itens.index')->with('success', 'Item excluído com sucesso!');
     }
 }

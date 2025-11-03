@@ -3,7 +3,7 @@
 
 @section('content')
 <div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-itens-center mb-4">
         <h1 class="h3 mb-0 text-gray-800">Dashboard do Administrador</h1>
     </div>
 
@@ -18,7 +18,7 @@
         <div class="col-xl-4 col-md-6 mb-4">
             <div class="card border-left-success shadow h-100 py-2" data-icon="👥">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
+                    <div class="row no-gutters align-itens-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 Gerenciamento</div>
@@ -36,7 +36,7 @@
         <div class="col-xl-4 col-md-6 mb-4">
             <div class="card border-left-primary shadow h-100 py-2" data-icon="⛪️">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
+                    <div class="row no-gutters align-itens-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                 Gerenciamento</div>
@@ -54,7 +54,7 @@
         <div class="col-xl-4 col-md-6 mb-4">
             <div class="card border-left-warning shadow h-100 py-2" data-icon="🫶">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
+                    <div class="row no-gutters align-itens-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                 Gerenciamento</div>
@@ -72,7 +72,7 @@
         <div class="col-xl-4 col-md-6 mb-4">
             <div class="card border-left-warning shadow h-100 py-2" data-icon="🕵️‍♂️">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
+                    <div class="row no-gutters align-itens-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
                                 Auditoria</div>

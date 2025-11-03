@@ -49,7 +49,7 @@ class Distribuicao extends Model
         return $this->belongsTo(Beneficiario::class);
     }
 
-    public function items(): BelongsToMany
+    public function itens(): BelongsToMany
     {
         return $this->belongsToMany(Item::class, 'distribuicao_item')
             ->withPivot(['estoque_id', 'quantidade', 'quantidade_reservada', 'unidade'])

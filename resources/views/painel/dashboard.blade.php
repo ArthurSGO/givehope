@@ -4,7 +4,7 @@
 @section('content')
 <div class="container">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-itens-center mb-4">
         <h1 class="h3 mb-0 text-gray-800">Painel da Paróquia: <strong>{{ $user->paroquia->nome_fantasia ?? 'Não associada' }}</strong></h1>
     </div>
 
@@ -15,7 +15,7 @@
     </div>
     @endif
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <div class="d-flex justify-content-between align-itens-center mb-3">
         <h2 class="h4 mb-0 text-gray-800">Resumo (Últimos 30 dias)</h2>
     </div>
 
@@ -24,7 +24,7 @@
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-primary shadow h-100 py-2">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
+                    <div class="row no-gutters align-itens-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-uppercase mb-1">
                                 Doações (Dinheiro)</div>
@@ -41,7 +41,7 @@
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-success shadow h-100 py-2">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
+                    <div class="row no-gutters align-itens-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-uppercase mb-1">
                                 Distribuições</div>
@@ -58,7 +58,7 @@
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-info shadow h-100 py-2">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
+                    <div class="row no-gutters align-itens-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-uppercase mb-1">
                                 Beneficiários Atendidos</div>
@@ -75,7 +75,7 @@
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-warning shadow h-100 py-2">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
+                    <div class="row no-gutters align-itens-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-uppercase mb-1">
                                 Itens em Estoque</div>
@@ -92,7 +92,7 @@
 
     <hr class="my-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-itens-center mb-4">
         <h2 class="h4 mb-0 text-gray-800">Acesso Rápido</h2>
     </div>
 
@@ -101,7 +101,7 @@
         <div class="col-xl-4 col-md-6 mb-4">
             <div class="card border-left-warning shadow h-100 py-2" data-icon="">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
+                    <div class="row no-gutters align-itens-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                 Cadastrar</div>
@@ -119,7 +119,7 @@
         <div class="col-xl-4 col-md-6 mb-4">
             <div class="card border-left-primary shadow h-100 py-2" data-icon="➕">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
+                    <div class="row no-gutters align-itens-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                 Cadastrar</div>
@@ -137,7 +137,7 @@
         <div class="col-xl-4 col-md-6 mb-4">
             <div class="card border-left-success shadow h-100 py-2" data-icon="">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
+                    <div class="row no-gutters align-itens-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 Cadastrar</div>
@@ -155,7 +155,7 @@
         <div class="col-xl-4 col-md-6 mb-4">
             <div class="card border-left-warning shadow h-100 py-2 card-icon-beneficiarios" data-icon="👥">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
+                    <div class="row no-gutters align-itens-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                 Cadastrar/Editar</div>
@@ -173,7 +173,7 @@
         <div class="col-xl-4 col-md-6 mb-4">
             <div class="card border-left-primary shadow h-100 py-2" data-icon="📋">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
+                    <div class="row no-gutters align-itens-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                 Gerenciar</div>
@@ -191,7 +191,7 @@
         <div class="col-xl-4 col-md-6 mb-4">
             <div class="card border-left-success shadow h-100 py-2" data-icon="🚛">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
+                    <div class="row no-gutters align-itens-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                 Gerenciar</div>
@@ -209,7 +209,7 @@
         <div class="col-xl-4 col-md-6 mb-4">
             <div class="card border-left-warning shadow h-100 py-2" data-icon="📊">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
+                    <div class="row no-gutters align-itens-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                 Consultar</div>
@@ -228,7 +228,7 @@
         <div class="col-xl-4 col-md-6 mb-4">
             <div class="card border-left-primary shadow h-100 py-2 card-icon-item" data-icon="📦">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
+                    <div class="row no-gutters align-itens-center">
                         <div class="col mr-2">
                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                 Cadastrar/Editar</div>
@@ -238,7 +238,7 @@
                             <i class="fas fa-inbox fa-2x text-gray-300"></i>
                         </div>
                     </div>
-                    <a href="{{ route('items.index') }}" class="stretched-link"></a>
+                    <a href="{{ route('itens.index') }}" class="stretched-link"></a>
                 </div>
             </div>
         </div>

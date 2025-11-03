@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('doacao_item', function (Blueprint $table) {
             $table->id();
             $table->foreignId('doacao_id')->constrained('doacoes')->onDelete('cascade');
-            $table->foreignId('item_id')->constrained('items')->onDelete('cascade');
+            $table->foreignId('item_id')->constrained('itens')->onDelete('cascade');
             $table->decimal('quantidade', 10, 2);
             $table->enum('unidade', ['Unidade', 'Kg']);
             $table->timestamps();
