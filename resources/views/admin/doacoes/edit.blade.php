@@ -138,6 +138,15 @@
 
                                 </div>
                             </div>
+                            <br>
+                            <div class="mb-3">
+                                <label for="descricao" class="form-label">Descrição / Observação</label>
+                                <textarea name="descricao" id="descricao" class="form-control"
+                                    rows="3">{{ old('descricao', $doacao->descricao) }}</textarea>
+                                @error('descricao')
+                                    <div class="text-danger small">{{ $message }}</div>
+                                @enderror
+                            </div>
 
                             <div class="mt-4 d-flex gap-2">
                                 <button type="submit" class="btn btn-success">Salvar alterações</button>
@@ -146,7 +155,6 @@
 
                         </div>
                     </div>
-
                 </form>
             </div>
         </div>

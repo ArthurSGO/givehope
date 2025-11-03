@@ -296,6 +296,7 @@ class DoacaoController extends Controller
             'itens.*.new_item_category' => ['nullable', 'in:alimento,outro'],
             'itens.*.quantidade' => ['required', 'numeric', 'gt:0'],
             'itens.*.unidade' => ['required', 'in:Kg,Unidade'],
+            'descricao' => ['nullable','string'],
         ]);
 
         $sync = [];
@@ -334,7 +335,10 @@ class DoacaoController extends Controller
             ];
         }
 
+        $doacao->descricao = $request->input('descricao');
+
         DB::transaction(function () use ($doacao, $sync) {
+            $doacao->save();
             $paroquiaId = $doacao->paroquia_id;
             $userId = Auth::id();
 
