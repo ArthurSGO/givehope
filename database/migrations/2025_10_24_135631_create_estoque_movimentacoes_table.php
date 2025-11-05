@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('estoque_id')->constrained('estoques')->cascadeOnDelete();
             $table->foreignId('paroquia_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('item_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('item_id')->constrained('itens')->cascadeOnDelete();
             $table->foreignId('distribuicao_id')->nullable()->constrained('distribuicoes')->nullOnDelete();
             $table->foreignId('doacao_id')->nullable()->constrained('doacoes')->nullOnDelete();
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();

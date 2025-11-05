@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('distribuicao_id')->constrained('distribuicoes')->cascadeOnDelete();
             $table->foreignId('estoque_id')->constrained('estoques')->cascadeOnDelete();
-            $table->foreignId('item_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('item_id')->constrained('itens')->cascadeOnDelete();
             $table->string('unidade', 20);
             $table->decimal('quantidade', 12, 3);
             $table->decimal('quantidade_reservada', 12, 3)->default(0);
