@@ -14,12 +14,14 @@ use App\Http\Controllers\ParoquiaController;
 use App\Http\Controllers\BeneficiarioController;
 use App\Http\Controllers\PublicDonationLookupController;
 use App\Http\Controllers\DistribuicaoController;
+use App\Http\Controllers\EventController;
 
 Route::middleware(['auth', 'is_admin'])->group(function () {
     Route::get('admin', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::resource('paroquias', ParoquiaController::class);
     Route::resource('users', UserController::class);
     Route::resource('logs', LogController::class);
+    Route::resource('events', EventController::class)->except(['show']);
 });
 
 Route::middleware(['auth'])->group(function () {
@@ -45,15 +47,10 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get('inprogress', function () {
-    return view('inprogress');
-})->name('inprogress');
-Route::get('finished', function () {
-    return view('finished');
-})->name('finished');
-Route::get('soon', function () {
-    return view('soon');
-})->name('soon');
+Route::get('events/{event}', [EventController::class, 'show'])->name('events.show');
+Route::get('soon', [EventController::class, 'soon'])->name('soon');
+Route::get('inprogress', [EventController::class, 'inProgress'])->name('inprogress');
+Route::get('finished', [EventController::class, 'finished'])->name('finished');
 Route::get('about', function () {
     return view('about');
 })->name('about');

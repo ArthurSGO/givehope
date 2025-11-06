@@ -1,0 +1,7 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="800" rx="48" fill="#E8F1FF"/>
+  <path d="M260 580L420 380L560 520L720 320L940 580H260Z" fill="#C8DAF5"/>
+  <circle cx="420" cy="300" r="90" fill="#9DB9ED"/>
+  <path d="M280 580H920C956.451 580 986 609.549 986 646V646C986 682.451 956.451 712 920 712H280C243.549 712 214 682.451 214 646V646C214 609.549 243.549 580 280 580Z" fill="#9DB9ED" opacity="0.35"/>
+  <text x="50%" y="70%" text-anchor="middle" fill="#5472C1" font-family="'Nunito', 'Helvetica Neue', Arial, sans-serif" font-size="48" font-weight="700">Evento solidário</text>
+</svg>
