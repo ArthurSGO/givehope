@@ -7,7 +7,7 @@
 
 @section('content')
     <div class="container py-4">
-        <a href="{{ route('events.index') }}" class="btn btn-light border mb-3">
+        <a href="{{ route('events.index') }}" class="btn btn-outline-secondary mb-3">
             <i class="fa-solid fa-arrow-left"></i> Voltar para os eventos
         </a>
 
@@ -21,7 +21,7 @@
             @csrf
 
             <div class="card shadow-sm mb-3">
-                <div class="card-header bg-white py-3">
+                <div class="card-header py-3">
                     <h1 class="h4 mb-0">Cadastrar evento de doação</h1>
                     <small class="text-muted">Os status serão atualizados automaticamente de acordo com as datas
                         informadas.</small>
@@ -105,8 +105,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="card-footer bg-white d-flex justify-content-end gap-2">
-                    <a href="{{ route('events.index') }}" class="btn btn-light">Cancelar</a>
+                <div class="card-footer d-flex justify-content-end gap-2">
+                    <a href="{{ route('events.index') }}" class="btn btn-secondary">Cancelar</a>
                     <button type="submit" class="btn btn-primary">
                         <i class="fa-solid fa-floppy-disk me-1"></i> Salvar evento
                     </button>
