@@ -13,7 +13,7 @@
                 <h1 class="h3 mb-1">{{ $heading }}</h1>
                 <p class="text-muted mb-0">Veja as campanhas que já foram concluídas e inspire-se para as próximas.</p>
             </div>
-            <a href="{{ url('/') }}" class="btn btn-light border">
+            <a href="{{ url()->previous() }}" class="btn btn-outline-secondary">
                 <i class="fa-solid fa-arrow-left"></i> Voltar
             </a>
         </div>

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 class Event extends Model
@@ -45,6 +46,21 @@ class Event extends Model
     ];
 
     protected $appends = ['image_url', 'status', 'status_label'];
+
+    public function scopeInProgress(Builder $query): Builder
+    {
+        $today = now()->startOfDay();
+
+        return $query
+            ->whereNotNull('start_date')
+            ->whereDate('start_date', '<=', $today)
+            ->where(function ($query) use ($today) {
+                $query
+                    ->whereNull('end_date')
+                    ->orWhereDate('end_date', '>=', $today);
+            });
+    }
+
 
     public static function statusLabels(): array
     {

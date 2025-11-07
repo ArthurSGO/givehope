@@ -8,6 +8,7 @@ use App\Models\Doacao;
 use App\Models\Distribuicao;
 use App\Models\Beneficiario;
 use App\Models\Estoque;
+use App\Models\Event;
 
 class PainelController extends Controller
 {
@@ -25,15 +26,15 @@ class PainelController extends Controller
 
             'distribuicoes_30d' => Distribuicao::where('paroquia_id', $paroquiaId)
                 ->whereIn('status', [Distribuicao::STATUS_ENVIADO, Distribuicao::STATUS_ENTREGUE])
-                ->where(function($query) use ($dataInicio) {
+                ->where(function ($query) use ($dataInicio) {
                     $query->where('enviado_em', '>=', $dataInicio)
-                          ->orWhere('entregue_em', '>=', $dataInicio);
+                        ->orWhere('entregue_em', '>=', $dataInicio);
                 })
                 ->count(),
-            
-            'beneficiarios_atendidos' => Beneficiario::whereHas('distribuicoes', function($query) use ($paroquiaId) {
+
+            'beneficiarios_atendidos' => Beneficiario::whereHas('distribuicoes', function ($query) use ($paroquiaId) {
                 $query->where('paroquia_id', $paroquiaId)
-                      ->whereIn('status', [Distribuicao::STATUS_ENVIADO, Distribuicao::STATUS_ENTREGUE]);
+                    ->whereIn('status', [Distribuicao::STATUS_ENVIADO, Distribuicao::STATUS_ENTREGUE]);
             })->count(),
 
             'itens_em_estoque' => Estoque::where('paroquia_id', $paroquiaId)
@@ -41,6 +42,12 @@ class PainelController extends Controller
                 ->count(),
         ];
 
-        return view('painel.dashboard', compact('user', 'stats'));
+        $inProgressEvents = Event::query()
+            ->inProgress()
+            ->orderBy('start_date')
+            ->orderBy('title')
+            ->get();
+
+        return view('painel.dashboard', compact('user', 'stats', 'inProgressEvents'));
     }
 }
