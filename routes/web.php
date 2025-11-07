@@ -15,6 +15,7 @@ use App\Http\Controllers\BeneficiarioController;
 use App\Http\Controllers\PublicDonationLookupController;
 use App\Http\Controllers\DistribuicaoController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\PublicReportController;
 
 Route::middleware(['auth', 'is_admin'])->group(function () {
     Route::get('admin', [AdminController::class, 'index'])->name('admin.dashboard');
@@ -47,6 +48,7 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/', function () {
     return view('welcome');
 });
+Route::get('reports', [PublicReportController::class, 'index'])->name('reports.general');
 Route::get('events/{event}', [EventController::class, 'show'])->name('events.show');
 Route::get('soon', [EventController::class, 'soon'])->name('soon');
 Route::get('inprogress', [EventController::class, 'inProgress'])->name('inprogress');

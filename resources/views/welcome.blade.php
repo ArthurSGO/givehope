@@ -68,7 +68,7 @@
         </div>
         
         <div class="col-lg-6">
-            <a href="#" class="text-decoration-none text-dark"> 
+            <a href="{{ route('reports.general') }}" class="text-decoration-none text-dark"> 
                 <div class="card h-100 shadow-sm" data-icon="📊">
                     <div class="card-body text-center d-flex flex-column justify-content-center">
                         <h5 class="card-title">Relatórios Gerais</h5>

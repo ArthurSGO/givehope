@@ -12,14 +12,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Spatie\Activitylog\Models\Activity;
-// Adiciona a classe de Exceção de Validação
-use Illuminate\Validation\ValidationException;
 
 class DoacaoController extends Controller
 {
-    // --- index, create, store ---
-    // (Seus métodos index, create e store permanecem como estão)
-    // ...
     public function index()
     {
         $user = Auth::user();
@@ -116,7 +111,6 @@ class DoacaoController extends Controller
 
             $doacao->quantidade = null;
             $doacao->unidade = null;
-            // $doacao->save(); // Salva só dentro da transação
 
             $itensCollection = collect($request->input('itens', []));
             $existingItemIds = $itensCollection
@@ -178,7 +172,7 @@ class DoacaoController extends Controller
                 DB::transaction(function () use ($doacao, $itensToAttach, $paroquiaId, $userId) {
                     $doacao->quantidade = null;
                     $doacao->unidade = null;
-                    $doacao->save(); // Agora salva a doação
+                    $doacao->save();
 
                     $doacao->itens()->attach($itensToAttach);
 
@@ -214,7 +208,6 @@ class DoacaoController extends Controller
 
         return redirect()->route('doacoes.index')->with('success', 'Doação registrada com sucesso!');
     }
-    // --- Fim index, create, store ---
 
     public function show($id)
     {
