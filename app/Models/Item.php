@@ -11,6 +11,8 @@ class Item extends Model
 
     protected $fillable = ['nome', 'categoria'];
 
+    protected $table = 'itens';
+    
     public function doacoes()
     {
         return $this->belongsToMany(Doacao::class, 'doacao_item')
