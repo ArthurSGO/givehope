@@ -81,6 +81,11 @@
                                     <td>{{ optional($distribuicao->enviado_em)->format('d/m/Y H:i') ?? '-' }}</td>
                                     <td>{{ optional($distribuicao->entregue_em)->format('d/m/Y H:i') ?? '-' }}</td>
                                     <td class="text-end">
+                                        @if ($distribuicao->status === 'reservado')
+                                        <a href="{{ route('distribuicoes.edit', $distribuicao) }}" class="btn btn-outline-primary btn-sm">
+                                            <i class="fa-solid fa-pen-to-square"></i> Editar
+                                        </a>
+                                        @endif
                                         <a href="{{ route('distribuicoes.show', $distribuicao) }}" class="btn btn-outline-secondary btn-sm">
                                             <i class="fa-solid fa-eye"></i> Ver
                                         </a>

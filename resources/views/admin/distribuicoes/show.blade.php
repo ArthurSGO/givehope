@@ -6,14 +6,28 @@
         <div class="col-md-10">
             <div class="d-flex justify-content-between align-itens-center mb-3">
                 <h2 class="h4 mb-0">Distribuição #{{ $distribuicao->id }}</h2>
-                <a href="{{ route('distribuicoes.index') }}" class="btn btn-secondary btn-sm">
-                    <i class="fa-solid fa-arrow-left"></i> Voltar
-                </a>
+                <div class="d-flex gap-2">
+                    @if ($distribuicao->status === 'reservado')
+                    <a href="{{ route('distribuicoes.edit', $distribuicao) }}" class="btn btn-primary btn-sm">
+                        <i class="fa-solid fa-pen-to-square"></i> Editar
+                    </a>
+                    @endif
+                    <a href="{{ route('distribuicoes.index') }}" class="btn btn-secondary btn-sm">
+                        <i class="fa-solid fa-arrow-left"></i> Voltar
+                    </a>
+                </div>
             </div>
 
             @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            @endif
+
+            @if (session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ session('error') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             @endif

@@ -42,8 +42,17 @@ class DistribuicaoController extends Controller
             ->where('paroquia_id', $user->paroquia_id)
             ->orderBy('item_id')
             ->orderBy('unidade')
-            ->get()
-            ->sortBy(fn (Estoque $estoque) => $estoque->item->nome)
+            ->get();
+
+        $estoques->each(function (Estoque $estoque) {
+            $estoque->quantidade_disponivel = $this->calcularDisponibilidade($estoque);
+            $estoque->quantidade_reservada = $estoque->distribuicaoitens
+                ->where('distribuicao.status', Distribuicao::STATUS_RESERVADO)
+                ->whereNull('distribuicao.estoque_debitado_em')
+                ->sum('quantidade_reservada');
+        });
+
+        $estoques = $estoques->sortBy(fn(Estoque $estoque) => $estoque->item->nome)
             ->values();
 
         return view('admin.distribuicoes.create', compact('beneficiarios', 'estoques'));
@@ -147,84 +156,198 @@ class DistribuicaoController extends Controller
         return view('admin.distribuicoes.show', compact('distribuicao', 'statusDisponiveis'));
     }
 
+    public function edit(Distribuicao $distribuicao)
+    {
+        $user = Auth::user();
+        $this->garantirParoquia($distribuicao, $user->paroquia_id);
+
+        if ($distribuicao->status !== Distribuicao::STATUS_RESERVADO) {
+            return redirect()->route('distribuicoes.show', $distribuicao)
+                ->with('error', 'Esta distribuição não pode ser editada, pois seu status é "' . $distribuicao->status . '".');
+        }
+
+        $beneficiarios = Beneficiario::orderBy('nome')->get();
+
+        $estoques = Estoque::with(['item'])
+            ->where('paroquia_id', $user->paroquia_id)
+            ->orderBy('item_id')
+            ->orderBy('unidade')
+            ->get();
+
+        $itensAtuais = $distribuicao->itens->keyBy('pivot.estoque_id');
+
+        $estoques->each(function (Estoque $estoque) use ($distribuicao, $itensAtuais) {
+
+            $maximoParaEstaReserva = $this->calcularDisponibilidade($estoque, $distribuicao->id);
+
+            $reservadoPorOutros = round(max(0, $estoque->quantidade - $maximoParaEstaReserva), 3);
+
+            $estoque->quantidade_disponivel = $maximoParaEstaReserva;
+            $estoque->quantidade_reservada = $reservadoPorOutros;
+            $estoque->quantidade_reservada_nesta = $itensAtuais->get($estoque->id)?->pivot->quantidade ?? 0;
+        });
+
+        $estoques = $estoques->sortBy(fn(Estoque $estoque) => $estoque->item->nome)
+            ->values();
+
+        return view('admin.distribuicoes.edit', compact('distribuicao', 'beneficiarios', 'estoques'));
+    }
+
     public function update(Request $request, Distribuicao $distribuicao): RedirectResponse
     {
         $user = Auth::user();
         $this->garantirParoquia($distribuicao, $user->paroquia_id);
 
-        $validated = $request->validate([
-            'status' => ['required', Rule::in([
-                Distribuicao::STATUS_RESERVADO,
-                Distribuicao::STATUS_ENVIADO,
-                Distribuicao::STATUS_ENTREGUE,
-            ])],
-            'observacoes' => ['nullable', 'string'],
-        ]);
+        if ($request->has('itens')) {
 
-        $novoStatus = $validated['status'];
-        $statusAtual = $distribuicao->status;
-
-        if (!in_array($novoStatus, $this->statusDisponiveis($distribuicao), true)) {
-            throw ValidationException::withMessages([
-                'status' => 'Transição de status inválida para esta distribuição.',
-            ]);
-        }
-
-        DB::transaction(function () use ($novoStatus, $statusAtual, $distribuicao, $validated, $user) {
-            $distribuicao->observacoes = Arr::get($validated, 'observacoes');
-
-            if ($novoStatus !== $statusAtual) {
-                if (in_array($novoStatus, [Distribuicao::STATUS_ENVIADO, Distribuicao::STATUS_ENTREGUE], true)
-                    && !$distribuicao->estoque_debitado_em) {
-                    $this->debitarEstoque($distribuicao, $user, $novoStatus);
-                }
-
-                if ($novoStatus === Distribuicao::STATUS_ENVIADO && !$distribuicao->enviado_em) {
-                    $distribuicao->enviado_em = now();
-                }
-
-                if ($novoStatus === Distribuicao::STATUS_ENTREGUE) {
-                    if (!$distribuicao->enviado_em) {
-                        $distribuicao->enviado_em = now();
-                    }
-                    $distribuicao->entregue_em = now();
-                }
-
-                $distribuicao->status = $novoStatus;
+            if ($distribuicao->status !== Distribuicao::STATUS_RESERVADO) {
+                return redirect()->route('distribuicoes.show', $distribuicao)
+                    ->with('error', 'Esta distribuição não pode ser editada, pois seu status é "' . $distribuicao->status . '".');
             }
 
-            $distribuicao->updated_by = $user->id;
-            $distribuicao->save();
-        });
+            $validated = $request->validate([
+                'beneficiario_id' => ['required', 'exists:beneficiarios,id'],
+                'observacoes' => ['nullable', 'string'],
+                'itens' => ['nullable', 'array'],
+            ]);
 
-        $distribuicao->refresh()->load('itens', 'beneficiario');
+            $itensSelecionados = $this->extrairItensDaRequisicao($request->input('itens', []));
 
-        if ($statusAtual !== $novoStatus) {
-            $mensagem = $novoStatus === Distribuicao::STATUS_ENTREGUE
-                ? 'Distribuição entregue ao beneficiário.'
-                : ($novoStatus === Distribuicao::STATUS_ENVIADO
-                    ? 'Distribuição enviada ao beneficiário.'
-                    : 'Distribuição atualizada.');
+            DB::transaction(function () use ($user, $distribuicao, $validated, $itensSelecionados) {
+                $distribuicao->update([
+                    'beneficiario_id' => $validated['beneficiario_id'],
+                    'observacoes' => Arr::get($validated, 'observacoes'),
+                    'updated_by' => $user->id,
+                ]);
+
+                DistribuicaoItem::where('distribuicao_id', $distribuicao->id)->delete();
+
+                foreach ($itensSelecionados as $item) {
+                    $estoque = Estoque::where('id', $item['estoque_id'])
+                        ->where('paroquia_id', $distribuicao->paroquia_id)
+                        ->lockForUpdate()
+                        ->first();
+
+                    if (!$estoque) {
+                        throw ValidationException::withMessages(['itens' => 'Item de estoque não encontrado.']);
+                    }
+
+                    $disponivel = $this->calcularDisponibilidade($estoque, $distribuicao->id);
+
+                    if ($disponivel < $item['quantidade']) {
+                        throw ValidationException::withMessages([
+                            "itens.{$estoque->id}.quantidade" => sprintf(
+                                'Quantidade solicitada (%.2f %s) excede o disponível (%.2f %s).',
+                                $item['quantidade'],
+                                $estoque->unidade,
+                                $disponivel,
+                                $estoque->unidade
+                            ),
+                        ]);
+                    }
+
+                    DistribuicaoItem::create([
+                        'distribuicao_id' => $distribuicao->id,
+                        'estoque_id' => $estoque->id,
+                        'item_id' => $estoque->item_id,
+                        'unidade' => $estoque->unidade,
+                        'quantidade' => $item['quantidade'],
+                        'quantidade_reservada' => $item['quantidade'],
+                    ]);
+                }
+            });
 
             activity('Distribuições')
                 ->performedOn($distribuicao)
                 ->causedBy($user)
-                ->withProperties([
-                    'status' => $novoStatus,
-                    'itens' => $distribuicao->itens->map(function (Item $item) {
-                        return [
-                            'item_id' => $item->id,
-                            'nome' => $item->nome,
-                            'quantidade' => $item->pivot->quantidade,
-                            'unidade' => $item->pivot->unidade,
-                        ];
-                    })->values(),
-                ])
-                ->log($mensagem);
-        }
+                ->log('Distribuição (itens/beneficiário) foi editada.');
 
-        return redirect()->route('distribuicoes.show', $distribuicao)
-            ->with('success', 'Distribuição atualizada com sucesso.');
+            return redirect()->route('distribuicoes.show', $distribuicao)
+                ->with('success', 'Distribuição atualizada com sucesso.');
+
+        } else {
+
+            $validated = $request->validate([
+                'status' => [
+                    'required',
+                    Rule::in([
+                        Distribuicao::STATUS_RESERVADO,
+                        Distribuicao::STATUS_ENVIADO,
+                        Distribuicao::STATUS_ENTREGUE,
+                    ])
+                ],
+                'observacoes' => ['nullable', 'string'],
+            ]);
+
+            $novoStatus = $validated['status'];
+            $statusAtual = $distribuicao->status;
+
+            if (!in_array($novoStatus, $this->statusDisponiveis($distribuicao), true)) {
+                throw ValidationException::withMessages([
+                    'status' => 'Transição de status inválida para esta distribuição.',
+                ]);
+            }
+
+            DB::transaction(function () use ($novoStatus, $statusAtual, $distribuicao, $validated, $user) {
+                $distribuicao->observacoes = Arr::get($validated, 'observacoes');
+
+                if ($novoStatus !== $statusAtual) {
+                    if (
+                        in_array($novoStatus, [Distribuicao::STATUS_ENVIADO, Distribuicao::STATUS_ENTREGUE], true)
+                        && !$distribuicao->estoque_debitado_em
+                    ) {
+                        $this->debitarEstoque($distribuicao, $user, $novoStatus);
+                    }
+
+                    if ($novoStatus === Distribuicao::STATUS_ENVIADO && !$distribuicao->enviado_em) {
+                        $distribuicao->enviado_em = now();
+                    }
+
+                    if ($novoStatus === Distribuicao::STATUS_ENTREGUE) {
+                        if (!$distribuicao->enviado_em) {
+                            $distribuicao->enviado_em = now();
+                        }
+                        if (!$distribuicao->entregue_em) {
+                            $distribuicao->entregue_em = now();
+                        }
+                    }
+
+                    $distribuicao->status = $novoStatus;
+                }
+
+                $distribuicao->updated_by = $user->id;
+                $distribuicao->save();
+            });
+
+            $distribuicao->refresh()->load('itens', 'beneficiario');
+
+            if ($statusAtual !== $novoStatus) {
+                $mensagem = $novoStatus === Distribuicao::STATUS_ENTREGUE
+                    ? 'Distribuição entregue ao beneficiário.'
+                    : ($novoStatus === Distribuicao::STATUS_ENVIADO
+                        ? 'Distribuição enviada ao beneficiário.'
+                        : 'Distribuição atualizada.');
+
+                activity('Distribuições')
+                    ->performedOn($distribuicao)
+                    ->causedBy($user)
+                    ->withProperties([
+                        'status' => $novoStatus,
+                        'itens' => $distribuicao->itens->map(function (Item $item) {
+                            return [
+                                'item_id' => $item->id,
+                                'nome' => $item->nome,
+                                'quantidade' => $item->pivot->quantidade,
+                                'unidade' => $item->pivot->unidade,
+                            ];
+                        })->values(),
+                    ])
+                    ->log($mensagem);
+            }
+
+            return redirect()->route('distribuicoes.show', $distribuicao)
+                ->with('success', 'Status da distribuição atualizado com sucesso.');
+        }
     }
 
     public function report(Request $request)
@@ -337,17 +460,18 @@ class DistribuicaoController extends Controller
 
     protected function calcularDisponibilidade(Estoque $estoque, int $excluirDistribuicao = 0): float
     {
-        $reservado = DistribuicaoItem::where('estoque_id', $estoque->id)
-            ->whereHas('distribuicao', function ($query) use ($estoque, $excluirDistribuicao) {
-                $query->where('paroquia_id', $estoque->paroquia_id)
-                    ->where('status', Distribuicao::STATUS_RESERVADO)
-                    ->whereNull('estoque_debitado_em');
+        $query = DistribuicaoItem::query()
+            ->join('distribuicoes', 'distribuicao_item.distribuicao_id', '=', 'distribuicoes.id')
+            ->where('distribuicao_item.estoque_id', $estoque->id)
+            ->where('distribuicoes.paroquia_id', $estoque->paroquia_id)
+            ->where('distribuicoes.status', Distribuicao::STATUS_RESERVADO)
+            ->whereNull('distribuicoes.estoque_debitado_em');
 
-                if ($excluirDistribuicao) {
-                    $query->where('id', '!=', $excluirDistribuicao);
-                }
-            })
-            ->sum('quantidade_reservada');
+        if ($excluirDistribuicao) {
+            $query->where('distribuicoes.id', '!=', $excluirDistribuicao);
+        }
+
+        $reservado = $query->sum('distribuicao_item.quantidade_reservada');
 
         return round(max(0, $estoque->quantidade - $reservado), 3);
     }
@@ -387,7 +511,16 @@ class DistribuicaoController extends Controller
                 continue;
             }
 
-            if (!is_numeric($quantidade) || (float) $quantidade <= 0) {
+            if (!is_numeric($quantidade) || (float) $quantidade < 0) {
+                $erros["itens.{$estoqueId}.quantidade"] = 'Informe uma quantidade válida para o item selecionado.';
+                continue;
+            }
+
+            if ((float) $quantidade === 0.0) {
+                continue;
+            }
+
+            if ((float) $quantidade <= 0) {
                 $erros["itens.{$estoqueId}.quantidade"] = 'Informe uma quantidade válida para o item selecionado.';
                 continue;
             }
@@ -401,6 +534,12 @@ class DistribuicaoController extends Controller
         if ($itensFormatados->isEmpty()) {
             $erros['itens'] = 'Selecione ao menos um item para distribuir.';
         }
+
+        $totalGeral = $itensFormatados->sum('quantidade');
+        if ($totalGeral <= 0) {
+            $erros['itens'] = 'A quantidade total a distribuir não pode ser zero.';
+        }
+
 
         if (!empty($erros)) {
             throw ValidationException::withMessages($erros);

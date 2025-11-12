@@ -42,6 +42,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('distribuicoes/create', [DistribuicaoController::class, 'create'])->name('distribuicoes.create');
     Route::post('distribuicoes', [DistribuicaoController::class, 'store'])->name('distribuicoes.store');
     Route::get('distribuicoes/{distribuicao}', [DistribuicaoController::class, 'show'])->name('distribuicoes.show');
+    Route::get('distribuicoes/{distribuicao}/edit', [DistribuicaoController::class, 'edit'])->name('distribuicoes.edit');
     Route::put('distribuicoes/{distribuicao}', [DistribuicaoController::class, 'update'])->name('distribuicoes.update');
 });
 
