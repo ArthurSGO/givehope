@@ -19,7 +19,7 @@
 
                         @php
                             $temDisponivel = $estoques->contains(function ($estoque) {
-                                return $estoque->quantidade_disponivel > 0;
+                                return ($estoque->maximo_para_reserva ?? 0) > 0;
                             });
                         @endphp
 
@@ -69,8 +69,9 @@
                                         <tbody>
                                             @forelse ($estoques as $estoque)
                                                 @php
-                                                    $maximoDisponivel = $estoque->quantidade_disponivel;
-                                                    $valorAtual = $estoque->quantidade_reservada_nesta;
+                                                    $reservadoPorOutros = $estoque->reservado_por_outros ?? 0;
+                                                    $maximoDisponivel = $estoque->maximo_para_reserva ?? 0;
+                                                    $valorAtual = $estoque->quantidade_reservada_nesta ?? 0;
                                                     $step = $estoque->unidade === 'Kg' ? '0.001' : '0.01';
                                                 @endphp
                                                 <tr @class(['table-warning' => $maximoDisponivel <= 0 && $valorAtual <= 0])>
@@ -80,14 +81,14 @@
                                                     <td class="text-center">
                                                         {{ $formatQuantidade($estoque->quantidade, $estoque->unidade) }}</td>
                                                     <td class="text-center">
-                                                        {{ $formatQuantidade($estoque->quantidade_reservada, $estoque->unidade) }}
+                                                        {{ $formatQuantidade($reservadoPorOutros, $estoque->unidade) }}
                                                     </td>
                                                     <td class="text-center fw-semibold">
                                                         {{ $formatQuantidade($maximoDisponivel, $estoque->unidade) }}</td>
                                                     <td>
                                                         <input type="number" name="itens[{{ $estoque->id }}][quantidade]"
                                                             class="form-control @error('itens.' . $estoque->id . '.quantidade') is-invalid @enderror"
-                                                            step="{{ $step }}" min="0" max="{{ $maximoDisponivel }}"
+                                                            step="{{ $step }}" min="0" max="{{ max($maximoDisponivel, $valorAtual) }}"
                                                             value="{{ old('itens.' . $estoque->id . '.quantidade', $valorAtual) }}"
                                                             @disabled($maximoDisponivel <= 0 && $valorAtual <= 0)>
                                                         @error('itens.' . $estoque->id . '.quantidade')

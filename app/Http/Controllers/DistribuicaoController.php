@@ -182,9 +182,12 @@ class DistribuicaoController extends Controller
 
             $reservadoPorOutros = round(max(0, $estoque->quantidade - $maximoParaEstaReserva), 3);
 
-            $estoque->quantidade_disponivel = $maximoParaEstaReserva;
-            $estoque->quantidade_reservada = $reservadoPorOutros;
-            $estoque->quantidade_reservada_nesta = $itensAtuais->get($estoque->id)?->pivot->quantidade ?? 0;
+            $estoque->setAttribute('maximo_para_reserva', $maximoParaEstaReserva);
+            $estoque->setAttribute('reservado_por_outros', $reservadoPorOutros);
+            $estoque->setAttribute(
+                'quantidade_reservada_nesta',
+                $itensAtuais->get($estoque->id)?->pivot->quantidade ?? 0
+            );
         });
 
         $estoques = $estoques->sortBy(fn(Estoque $estoque) => $estoque->item->nome)
