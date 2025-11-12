@@ -9,7 +9,7 @@
 
     <title>@yield('title')</title>
     <script>
-        (function () {
+        (function() {
             if (window.themeTransitioning) {
                 return;
             }
@@ -67,53 +67,7 @@
             </button>
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto">
-
-                </ul>
-
-                <ul class="navbar-nav ms-auto">
-                    @guest
-                        @if (Route::has('login'))
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-                            </li>
-                        @endif
-
-                    @else
-                        <li class="nav-item dropdown">
-                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
-                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                {{ Auth::user()->name }}
-                            </a>
-
-                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                @if (Auth::user()->is_admin)
-                                    <a href="{{ route('admin.dashboard') }}" class="dropdown-item">
-                                        <i class="fa-solid fa-screwdriver-wrench"></i> Painel de Administração
-                                    </a>
-
-                                @else
-                                    <a href="{{ route('painel.dashboard') }}" class="dropdown-item">
-                                        <i class="fa-solid fa-church"></i> Painel da Paróquia
-                                    </a>
-                                @endif
-
-                                <div class="dropdown-divider"></div>
-
-                                <a class="dropdown-item" href="{{ route('logout') }}"
-                                    onclick="event.preventDefault();
-                                                                             document.getElementById('logout-form').submit();">
-                                    {{ __('Logout') }}
-                                </a>
-
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                    @csrf
-                                </form>
-                            </div>
-                        </li>
-                    @endguest
-                </ul>
-                <ul class="navbar-nav ms-2">
+                <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
                         <button class="btn nav-link px-2" onclick="toggleTheme(event)" aria-label="Toggle theme">
                             <span class="theme-icon-wrapper">
@@ -122,6 +76,43 @@
                             </span>
                         </button>
                     </li>
+                    @guest
+                    @if (Route::has('login'))
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+                    </li>
+                    @endif
+
+                    @else
+                    <li class="nav-item">
+                        @if (Auth::user()->is_admin)
+                        <a href="{{ route('admin.dashboard') }}" class="nav-link">
+                            <i class="fa-solid fa-screwdriver-wrench"></i> Painel de Administração
+                        </a>
+                        @else
+                        <a href="{{ route('painel.dashboard') }}" class="nav-link">
+                            <i class="fa-solid fa-church"></i> Painel da Paróquia
+                        </a>
+                        @endif
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                            {{ Auth::user()->name }}
+                        </a>
+
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{{ route('logout') }}" data-logout-button
+                                data-logout-form="logout-form">
+                                {{ __('Logout') }}
+                            </a>
+
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                @csrf
+                            </form>
+                        </div>
+                    </li>
+                    @endguest
                 </ul>
             </div>
         </div>
@@ -145,6 +136,37 @@
         </ul>
         <p class="text-center text-body-secondary">© 2025 GiveHope</p>
     </footer>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutLink = document.querySelector('[data-logout-button]');
+            if (!logoutLink) {
+                return;
+            }
+
+            logoutLink.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                const formId = logoutLink.getAttribute('data-logout-form');
+                const logoutForm = document.getElementById(formId);
+                if (!logoutForm) {
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Tem certeza que deseja sair?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sim, sair',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        logoutForm.submit();
+                    }
+                });
+            });
+        });
+    </script>
     @stack('scripts')
 </body>
 

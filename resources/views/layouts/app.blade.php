@@ -10,7 +10,7 @@
 
     <title>@yield('title')</title>
     <script>
-        (function () {
+        (function() {
             if (window.themeTransitioning) {
                 return;
             }
@@ -62,44 +62,44 @@
 
                     <ul class="navbar-nav ms-auto">
                         @guest
-                            @if (Route::has('login'))
-                                <li class="nav-item">
-                                    <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
-                                </li>
-                            @endif
+                        @if (Route::has('login'))
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+                        </li>
+                        @endif
 
                         @else
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
-                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    {{ Auth::user()->name }}
+                        <li class="nav-item dropdown">
+                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
+                                data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                {{ Auth::user()->name }}
+                            </a>
+
+                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                @if (Auth::user()->is_admin)
+                                <a href="{{ route('admin.dashboard') }}" class="dropdown-item">
+                                    <i class="fa-solid fa-screwdriver-wrench"></i> Painel de Administração
                                 </a>
 
-                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    @if (Auth::user()->is_admin)
-                                        <a href="{{ route('admin.dashboard') }}" class="dropdown-item">
-                                            <i class="fa-solid fa-screwdriver-wrench"></i> Painel de Administração
-                                        </a>
+                                @else
+                                <a href="{{ route('painel.dashboard') }}" class="dropdown-item">
+                                    <i class="fa-solid fa-church"></i> Painel da Paróquia
+                                </a>
+                                @endif
 
-                                    @else
-                                        <a href="{{ route('painel.dashboard') }}" class="dropdown-item">
-                                            <i class="fa-solid fa-church"></i> Painel da Paróquia
-                                        </a>
-                                    @endif
+                                <div class="dropdown-divider"></div>
 
-                                    <div class="dropdown-divider"></div>
-
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                        onclick="event.preventDefault();
+                                <a class="dropdown-item" href="{{ route('logout') }}"
+                                    onclick="event.preventDefault();
                                                                                  document.getElementById('logout-form').submit();">
-                                        {{ __('Logout') }}
-                                    </a>
+                                    {{ __('Logout') }}
+                                </a>
 
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                        @csrf
-                                    </form>
-                                </div>
-                            </li>
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                    @csrf
+                                </form>
+                            </div>
+                        </li>
                         @endguest
                     </ul>
                     <ul class="navbar-nav ms-2">
@@ -137,6 +137,38 @@
             <p class="text-center text-body-secondary">© 2025 GiveHope</p>
         </footer>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const logoutLink = document.querySelector('[data-logout-button]');
+            if (!logoutLink) {
+                return;
+            }
+
+            logoutLink.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                const formId = logoutLink.getAttribute('data-logout-form');
+                const logoutForm = document.getElementById(formId);
+                if (!logoutForm) {
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Tem certeza que deseja sair?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sim, sair',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        logoutForm.submit();
+                    }
+                });
+            });
+        });
+    </script>
+    @stack('scripts')
 </body>
 
 </html>
