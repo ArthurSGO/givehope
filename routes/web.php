@@ -44,6 +44,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('distribuicoes/{distribuicao}', [DistribuicaoController::class, 'show'])->name('distribuicoes.show');
     Route::get('distribuicoes/{distribuicao}/edit', [DistribuicaoController::class, 'edit'])->name('distribuicoes.edit');
     Route::put('distribuicoes/{distribuicao}', [DistribuicaoController::class, 'update'])->name('distribuicoes.update');
+    Route::get('/change-password', [UserController::class, 'changePassword'])->name('password.change')->middleware('auth');
+    Route::post('/update-password', [UserController::class, 'updatePassword'])->name('password.update')->middleware('auth');
+
 });
 
 Route::get('/', function () {
