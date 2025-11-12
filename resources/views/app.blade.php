@@ -100,11 +100,14 @@
                             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                             {{ Auth::user()->name }}
                         </a>
-
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{{ route('password.change') }}">
+                                <i class="fa-solid fa-key me-2"></i> Alterar senha
+                            </a>
+
                             <a class="dropdown-item" href="{{ route('logout') }}" data-logout-button
                                 data-logout-form="logout-form">
-                                {{ __('Logout') }}
+                                <i class="fa-solid fa-right-from-bracket me-2"></i> {{ __('Logout') }}
                             </a>
 
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
