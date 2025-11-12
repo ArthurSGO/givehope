@@ -87,7 +87,7 @@
                     <li class="nav-item">
                         @if (Auth::user()->is_admin)
                         <a href="{{ route('admin.dashboard') }}" class="nav-link">
-                            <i class="fa-solid fa-screwdriver-wrench"></i> Painel de Administração
+                            <i class="fa-solid fa-screwdriver-wrench"></i>Painel de Administração
                         </a>
                         @else
                         <a href="{{ route('painel.dashboard') }}" class="nav-link">

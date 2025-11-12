@@ -2,6 +2,16 @@
 @section('title', 'Sobre')
 
 @section('content')
+    @php
+        $activeDonorsCount = \App\Models\Doador::whereHas('doacoes')->count();
+        $finishedCampaignsCount = \App\Models\Event::all()
+            ->filter(fn($event) => $event->status === \App\Models\Event::STATUS_FINISHED)
+            ->count();
+        $totalCampaignsCount = \App\Models\Event::count();
+        $finishedCampaignsPercentage = $totalCampaignsCount > 0
+            ? round(($finishedCampaignsCount / $totalCampaignsCount) * 100)
+            : 0;
+    @endphp
     <div class="about-page pb-5">
         <section class="about-hero text-center text-white position-relative overflow-hidden rounded-4 shadow-sm">
             <div class="hero-overlay"></div>
@@ -14,11 +24,11 @@
                     clara, acolhedora e acessível para todos os envolvidos.</p>
                 <div class="d-flex flex-wrap justify-content-center gap-3">
                     <div class="stat-card">
-                        <span class="stat-number">+2k</span>
+                        <span class="stat-number">{{ number_format($activeDonorsCount, 0, ',', '.') }}</span>
                         <span class="stat-label">Doadores ativos</span>
                     </div>
                     <div class="stat-card">
-                        <span class="stat-number">89%</span>
+                        <span class="stat-number">{{ $finishedCampaignsPercentage }}%</span>
                         <span class="stat-label">Campanhas concluídas</span>
                     </div>
                     <div class="stat-card">
