@@ -102,6 +102,11 @@
                         </a>
 
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <a href="{{ route('password.change') }}" class="dropdown-item">
+                                <i class="fa-solid fa-key"></i> Alterar senha
+                            </a>
+
+                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="{{ route('logout') }}" data-logout-button
                                 data-logout-form="logout-form">
                                 {{ __('Logout') }}

@@ -16,6 +16,7 @@ use App\Http\Controllers\PublicDonationLookupController;
 use App\Http\Controllers\DistribuicaoController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\PublicReportController;
+use App\Http\Controllers\Auth\ChangePasswordController;
 
 Route::middleware(['auth', 'is_admin'])->group(function () {
     Route::get('admin', [AdminController::class, 'index'])->name('admin.dashboard');
@@ -44,6 +45,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('distribuicoes/{distribuicao}', [DistribuicaoController::class, 'show'])->name('distribuicoes.show');
     Route::get('distribuicoes/{distribuicao}/edit', [DistribuicaoController::class, 'edit'])->name('distribuicoes.edit');
     Route::put('distribuicoes/{distribuicao}', [DistribuicaoController::class, 'update'])->name('distribuicoes.update');
+    Route::get('password/change', [ChangePasswordController::class, 'show'])->name('password.change');
+    Route::post('password/change', [ChangePasswordController::class, 'update'])->name('password.change.update');
 });
 
 Route::get('/', function () {

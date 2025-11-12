@@ -89,6 +89,12 @@
 
                                 <div class="dropdown-divider"></div>
 
+                                <a href="{{ route('password.change') }}" class="dropdown-item">
+                                    <i class="fa-solid fa-key"></i> Alterar senha
+                                </a>
+
+                                <div class="dropdown-divider"></div>
+
                                 <a class="dropdown-item" href="{{ route('logout') }}"
                                     onclick="event.preventDefault();
                                                                                  document.getElementById('logout-form').submit();">
