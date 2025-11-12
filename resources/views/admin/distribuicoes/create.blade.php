@@ -118,7 +118,7 @@
                             </div>
 
                             <div class="d-flex justify-content-end gap-2">
-                                <a href="{{ route('distribuicoes.index') }}" class="btn btn-secondary">Cancelar</a>
+                                <a href="{{ route('painel.dashboard') }}" class="btn btn-secondary">Cancelar</a>
                                 <button type="submit" class="btn btn-primary" @disabled(!$temDisponivel)>Reservar
                                     Itens</button>
                             </div>

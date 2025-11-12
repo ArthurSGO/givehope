@@ -95,7 +95,7 @@
                                 <button type="submit" class="btn btn-success">
                                     Salvar Alterações
                                 </button>
-                                <a href="{{ request('redirect_to' ?? route('users.index')) }}" class="btn btn-secondary">Cancelar</a>
+                                <a href="{{ request('redirect_to', route('admin.dashboard')) }}" class="btn btn-secondary">Cancelar</a>
                             </div>
                         </div>
                     </form>
